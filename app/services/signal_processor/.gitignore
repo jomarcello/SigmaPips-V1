@@ -1,5 +1,5 @@
-.
-├── .gitignore           # Hier moet de .gitignore staan
+ .
+├── .gitignore           # Nieuwe .gitignore in root
 ├── pyproject.toml
 ├── poetry.lock
 ├── Dockerfile
@@ -8,4 +8,4 @@
     ├── main.py
     └── services/
         └── signal_processor/
-            └── ... 
+            └── ...
