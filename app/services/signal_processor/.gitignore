@@ -1,5 +1,11 @@
-__pycache__/
-*.pyc
-.env
-venv/
-.DS_Store
+.
+├── .gitignore           # Hier moet de .gitignore staan
+├── pyproject.toml
+├── poetry.lock
+├── Dockerfile
+└── app/
+    ├── __init__.py
+    ├── main.py
+    └── services/
+        └── signal_processor/
+            └── ... 
