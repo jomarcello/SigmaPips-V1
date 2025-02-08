@@ -1,0 +1,759 @@
+2025-02-08 11:07:49,737 - root - INFO - Logging setup complete
+2025-02-08 11:07:49,737 - root - INFO - Python version: 3.13.1 (main, Dec  3 2024, 17:59:52) [Clang 16.0.0 (clang-1600.0.26.4)]
+2025-02-08 11:07:49,737 - root - INFO - Current working directory: /Users/jovannitilborg/Desktop/Databases
+2025-02-08 11:07:49,737 - root - INFO - Logs directory: /Users/jovannitilborg/Desktop/Databases/trading_bot/logs
+2025-02-08 11:07:49,738 - asyncio - DEBUG - Using selector: KqueueSelector
+2025-02-08 11:07:49,739 - root - INFO - Environment variables loaded
+2025-02-08 11:07:49,740 - root - INFO - TELEGRAM_BOT_TOKEN present: True
+2025-02-08 11:07:49,740 - root - INFO - OPENAI_API_KEY present: True
+2025-02-08 11:07:49,740 - root - INFO - SUPABASE_URL present: True
+2025-02-08 11:07:49,740 - root - INFO - === Starting Database Service Test ===
+2025-02-08 11:07:49,740 - root - ERROR - Error in database test
+Traceback (most recent call last):
+  File "/Users/jovannitilborg/Desktop/Databases/trading_bot/test_services.py", line 79, in test_database
+    db = Database()
+  File "/Users/jovannitilborg/Desktop/Databases/trading_bot/services/database/db.py", line 18, in __init__
+    self.supabase = create_client(supabase_url, supabase_key)
+                    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/client.py", line 332, in create_client
+    return SyncClient.create(
+           ~~~~~~~~~~~~~~~~~^
+        supabase_url=supabase_url, supabase_key=supabase_key, options=options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/client.py", line 102, in create
+    client = cls(supabase_url, supabase_key, options)
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/client.py", line 80, in __init__
+    self.auth = self._init_supabase_auth_client(
+                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        auth_url=self.auth_url,
+        ^^^^^^^^^^^^^^^^^^^^^^^
+        client_options=options,
+        ^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/client.py", line 243, in _init_supabase_auth_client
+    return SyncSupabaseAuthClient(
+        url=auth_url,
+    ...<5 lines>...
+        verify=verify,
+    )
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/auth_client.py", line 32, in __init__
+    SyncGoTrueClient.__init__(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self,
+        ^^^^^
+    ...<8 lines>...
+        verify=verify,
+        ^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/gotrue/_sync/gotrue_client.py", line 101, in __init__
+    SyncGoTrueBaseAPI.__init__(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self,
+        ^^^^^
+    ...<4 lines>...
+        proxy=proxy,
+        ^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/gotrue/_sync/gotrue_base_api.py", line 28, in __init__
+    self._http_client = http_client or SyncClient(
+                                       ~~~~~~~~~~^
+        verify=bool(verify),
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<2 lines>...
+        http2=True,
+        ^^^^^^^^^^^
+    )
+    ^
+TypeError: Client.__init__() got an unexpected keyword argument 'proxy'
+2025-02-08 11:07:49,743 - root - INFO - === Starting News AI Service Test ===
+2025-02-08 11:07:49,743 - root - ERROR - Error in sentiment test
+Traceback (most recent call last):
+  File "/Users/jovannitilborg/Desktop/Databases/trading_bot/test_services.py", line 59, in test_sentiment
+    db = Database()
+  File "/Users/jovannitilborg/Desktop/Databases/trading_bot/services/database/db.py", line 18, in __init__
+    self.supabase = create_client(supabase_url, supabase_key)
+                    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/client.py", line 332, in create_client
+    return SyncClient.create(
+           ~~~~~~~~~~~~~~~~~^
+        supabase_url=supabase_url, supabase_key=supabase_key, options=options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/client.py", line 102, in create
+    client = cls(supabase_url, supabase_key, options)
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/client.py", line 80, in __init__
+    self.auth = self._init_supabase_auth_client(
+                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        auth_url=self.auth_url,
+        ^^^^^^^^^^^^^^^^^^^^^^^
+        client_options=options,
+        ^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/client.py", line 243, in _init_supabase_auth_client
+    return SyncSupabaseAuthClient(
+        url=auth_url,
+    ...<5 lines>...
+        verify=verify,
+    )
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/auth_client.py", line 32, in __init__
+    SyncGoTrueClient.__init__(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self,
+        ^^^^^
+    ...<8 lines>...
+        verify=verify,
+        ^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/gotrue/_sync/gotrue_client.py", line 101, in __init__
+    SyncGoTrueBaseAPI.__init__(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self,
+        ^^^^^
+    ...<4 lines>...
+        proxy=proxy,
+        ^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/gotrue/_sync/gotrue_base_api.py", line 28, in __init__
+    self._http_client = http_client or SyncClient(
+                                       ~~~~~~~~~~^
+        verify=bool(verify),
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<2 lines>...
+        http2=True,
+        ^^^^^^^^^^^
+    )
+    ^
+TypeError: Client.__init__() got an unexpected keyword argument 'proxy'
+2025-02-08 11:07:49,744 - root - INFO - === Starting Telegram Service Test ===
+2025-02-08 11:07:49,744 - root - ERROR - Error in Telegram test
+Traceback (most recent call last):
+  File "/Users/jovannitilborg/Desktop/Databases/trading_bot/test_services.py", line 20, in test_telegram
+    db = Database()
+  File "/Users/jovannitilborg/Desktop/Databases/trading_bot/services/database/db.py", line 18, in __init__
+    self.supabase = create_client(supabase_url, supabase_key)
+                    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/client.py", line 332, in create_client
+    return SyncClient.create(
+           ~~~~~~~~~~~~~~~~~^
+        supabase_url=supabase_url, supabase_key=supabase_key, options=options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/client.py", line 102, in create
+    client = cls(supabase_url, supabase_key, options)
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/client.py", line 80, in __init__
+    self.auth = self._init_supabase_auth_client(
+                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        auth_url=self.auth_url,
+        ^^^^^^^^^^^^^^^^^^^^^^^
+        client_options=options,
+        ^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/client.py", line 243, in _init_supabase_auth_client
+    return SyncSupabaseAuthClient(
+        url=auth_url,
+    ...<5 lines>...
+        verify=verify,
+    )
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/auth_client.py", line 32, in __init__
+    SyncGoTrueClient.__init__(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self,
+        ^^^^^
+    ...<8 lines>...
+        verify=verify,
+        ^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/gotrue/_sync/gotrue_client.py", line 101, in __init__
+    SyncGoTrueBaseAPI.__init__(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self,
+        ^^^^^
+    ...<4 lines>...
+        proxy=proxy,
+        ^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/gotrue/_sync/gotrue_base_api.py", line 28, in __init__
+    self._http_client = http_client or SyncClient(
+                                       ~~~~~~~~~~^
+        verify=bool(verify),
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<2 lines>...
+        http2=True,
+        ^^^^^^^^^^^
+    )
+    ^
+TypeError: Client.__init__() got an unexpected keyword argument 'proxy'
+2025-02-08 11:11:48,673 - root - INFO - Logging setup complete
+2025-02-08 11:11:48,674 - root - INFO - Python version: 3.13.1 (main, Dec  3 2024, 17:59:52) [Clang 16.0.0 (clang-1600.0.26.4)]
+2025-02-08 11:11:48,674 - root - INFO - Current working directory: /Users/jovannitilborg/Desktop/Databases
+2025-02-08 11:11:48,674 - root - INFO - Logs directory: /Users/jovannitilborg/Desktop/Databases/trading_bot/logs
+2025-02-08 11:11:48,674 - asyncio - DEBUG - Using selector: KqueueSelector
+2025-02-08 11:11:48,677 - root - INFO - Environment variables loaded
+2025-02-08 11:11:48,677 - root - INFO - TELEGRAM_BOT_TOKEN present: True
+2025-02-08 11:11:48,677 - root - INFO - OPENAI_API_KEY present: True
+2025-02-08 11:11:48,677 - root - INFO - SUPABASE_URL present: True
+2025-02-08 11:11:48,677 - root - INFO - === Starting Database Service Test ===
+2025-02-08 11:11:48,677 - trading_bot.services.database.db - ERROR - Failed to connect to Supabase: 'dict' object has no attribute 'headers'
+2025-02-08 11:11:48,677 - root - ERROR - Error in database test
+Traceback (most recent call last):
+  File "/Users/jovannitilborg/Desktop/Databases/trading_bot/test_services.py", line 79, in test_database
+    db = Database()
+  File "/Users/jovannitilborg/Desktop/Databases/trading_bot/services/database/db.py", line 20, in __init__
+    self.supabase = create_client(
+                    ~~~~~~~~~~~~~^
+        supabase_url=supabase_url,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        }
+        ^
+    )
+    ^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/client.py", line 332, in create_client
+    return SyncClient.create(
+           ~~~~~~~~~~~~~~~~~^
+        supabase_url=supabase_url, supabase_key=supabase_key, options=options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/client.py", line 101, in create
+    auth_header = options.headers.get("Authorization") if options else None
+                  ^^^^^^^^^^^^^^^
+AttributeError: 'dict' object has no attribute 'headers'
+2025-02-08 11:11:48,679 - root - INFO - === Starting News AI Service Test ===
+2025-02-08 11:11:48,679 - trading_bot.services.database.db - ERROR - Failed to connect to Supabase: 'dict' object has no attribute 'headers'
+2025-02-08 11:11:48,679 - root - ERROR - Error in sentiment test
+Traceback (most recent call last):
+  File "/Users/jovannitilborg/Desktop/Databases/trading_bot/test_services.py", line 59, in test_sentiment
+    db = Database()
+  File "/Users/jovannitilborg/Desktop/Databases/trading_bot/services/database/db.py", line 20, in __init__
+    self.supabase = create_client(
+                    ~~~~~~~~~~~~~^
+        supabase_url=supabase_url,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        }
+        ^
+    )
+    ^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/client.py", line 332, in create_client
+    return SyncClient.create(
+           ~~~~~~~~~~~~~~~~~^
+        supabase_url=supabase_url, supabase_key=supabase_key, options=options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/client.py", line 101, in create
+    auth_header = options.headers.get("Authorization") if options else None
+                  ^^^^^^^^^^^^^^^
+AttributeError: 'dict' object has no attribute 'headers'
+2025-02-08 11:11:48,680 - root - INFO - === Starting Telegram Service Test ===
+2025-02-08 11:11:48,680 - trading_bot.services.database.db - ERROR - Failed to connect to Supabase: 'dict' object has no attribute 'headers'
+2025-02-08 11:11:48,680 - root - ERROR - Error in Telegram test
+Traceback (most recent call last):
+  File "/Users/jovannitilborg/Desktop/Databases/trading_bot/test_services.py", line 20, in test_telegram
+    db = Database()
+  File "/Users/jovannitilborg/Desktop/Databases/trading_bot/services/database/db.py", line 20, in __init__
+    self.supabase = create_client(
+                    ~~~~~~~~~~~~~^
+        supabase_url=supabase_url,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        }
+        ^
+    )
+    ^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/client.py", line 332, in create_client
+    return SyncClient.create(
+           ~~~~~~~~~~~~~~~~~^
+        supabase_url=supabase_url, supabase_key=supabase_key, options=options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/client.py", line 101, in create
+    auth_header = options.headers.get("Authorization") if options else None
+                  ^^^^^^^^^^^^^^^
+AttributeError: 'dict' object has no attribute 'headers'
+2025-02-08 11:17:36,624 - root - INFO - Logging setup complete
+2025-02-08 11:17:36,626 - root - INFO - Python version: 3.13.1 (main, Dec  3 2024, 17:59:52) [Clang 16.0.0 (clang-1600.0.26.4)]
+2025-02-08 11:17:36,626 - root - INFO - Current working directory: /Users/jovannitilborg/Desktop/Databases
+2025-02-08 11:17:36,626 - root - INFO - Logs directory: /Users/jovannitilborg/Desktop/Databases/trading_bot/logs
+2025-02-08 11:17:36,626 - asyncio - DEBUG - Using selector: KqueueSelector
+2025-02-08 11:17:36,628 - root - INFO - Environment variables loaded
+2025-02-08 11:17:36,629 - root - INFO - TELEGRAM_BOT_TOKEN present: True
+2025-02-08 11:17:36,629 - root - INFO - OPENAI_API_KEY present: True
+2025-02-08 11:17:36,629 - root - INFO - SUPABASE_URL present: True
+2025-02-08 11:17:36,629 - root - INFO - === Starting Database Service Test ===
+2025-02-08 11:17:36,639 - httpx - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-02-08 11:17:36,641 - httpx - DEBUG - load_verify_locations cafile='/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/certifi/cacert.pem'
+2025-02-08 11:17:36,651 - trading_bot.services.database.db - ERROR - Failed to connect to Supabase: 'dict' object has no attribute 'headers'
+2025-02-08 11:17:36,652 - root - ERROR - Error in database test
+Traceback (most recent call last):
+  File "/Users/jovannitilborg/Desktop/Databases/trading_bot/test_services.py", line 79, in test_database
+    db = Database()
+  File "/Users/jovannitilborg/Desktop/Databases/trading_bot/services/database/db.py", line 24, in __init__
+    self.supabase = create_client(
+                    ~~~~~~~~~~~~~^
+        supabase_url=supabase_url,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+        supabase_key=supabase_key,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+        options={"http_client": http_client}
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/client.py", line 332, in create_client
+    return SyncClient.create(
+           ~~~~~~~~~~~~~~~~~^
+        supabase_url=supabase_url, supabase_key=supabase_key, options=options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/client.py", line 101, in create
+    auth_header = options.headers.get("Authorization") if options else None
+                  ^^^^^^^^^^^^^^^
+AttributeError: 'dict' object has no attribute 'headers'
+2025-02-08 11:17:36,655 - root - INFO - === Starting News AI Service Test ===
+2025-02-08 11:17:36,655 - httpx - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-02-08 11:17:36,656 - httpx - DEBUG - load_verify_locations cafile='/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/certifi/cacert.pem'
+2025-02-08 11:17:36,665 - trading_bot.services.database.db - ERROR - Failed to connect to Supabase: 'dict' object has no attribute 'headers'
+2025-02-08 11:17:36,665 - root - ERROR - Error in sentiment test
+Traceback (most recent call last):
+  File "/Users/jovannitilborg/Desktop/Databases/trading_bot/test_services.py", line 59, in test_sentiment
+    db = Database()
+  File "/Users/jovannitilborg/Desktop/Databases/trading_bot/services/database/db.py", line 24, in __init__
+    self.supabase = create_client(
+                    ~~~~~~~~~~~~~^
+        supabase_url=supabase_url,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+        supabase_key=supabase_key,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+        options={"http_client": http_client}
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/client.py", line 332, in create_client
+    return SyncClient.create(
+           ~~~~~~~~~~~~~~~~~^
+        supabase_url=supabase_url, supabase_key=supabase_key, options=options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/client.py", line 101, in create
+    auth_header = options.headers.get("Authorization") if options else None
+                  ^^^^^^^^^^^^^^^
+AttributeError: 'dict' object has no attribute 'headers'
+2025-02-08 11:17:36,667 - root - INFO - === Starting Telegram Service Test ===
+2025-02-08 11:17:36,668 - httpx - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-02-08 11:17:36,668 - httpx - DEBUG - load_verify_locations cafile='/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/certifi/cacert.pem'
+2025-02-08 11:17:36,677 - trading_bot.services.database.db - ERROR - Failed to connect to Supabase: 'dict' object has no attribute 'headers'
+2025-02-08 11:17:36,677 - root - ERROR - Error in Telegram test
+Traceback (most recent call last):
+  File "/Users/jovannitilborg/Desktop/Databases/trading_bot/test_services.py", line 20, in test_telegram
+    db = Database()
+  File "/Users/jovannitilborg/Desktop/Databases/trading_bot/services/database/db.py", line 24, in __init__
+    self.supabase = create_client(
+                    ~~~~~~~~~~~~~^
+        supabase_url=supabase_url,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+        supabase_key=supabase_key,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+        options={"http_client": http_client}
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/client.py", line 332, in create_client
+    return SyncClient.create(
+           ~~~~~~~~~~~~~~~~~^
+        supabase_url=supabase_url, supabase_key=supabase_key, options=options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/client.py", line 101, in create
+    auth_header = options.headers.get("Authorization") if options else None
+                  ^^^^^^^^^^^^^^^
+AttributeError: 'dict' object has no attribute 'headers'
+2025-02-08 11:21:52,388 - root - INFO - Logging setup complete
+2025-02-08 11:21:52,389 - root - INFO - Python version: 3.13.1 (main, Dec  3 2024, 17:59:52) [Clang 16.0.0 (clang-1600.0.26.4)]
+2025-02-08 11:21:52,389 - root - INFO - Current working directory: /Users/jovannitilborg/Desktop/Databases
+2025-02-08 11:21:52,389 - root - INFO - Logs directory: /Users/jovannitilborg/Desktop/Databases/trading_bot/logs
+2025-02-08 11:21:52,389 - asyncio - DEBUG - Using selector: KqueueSelector
+2025-02-08 11:21:52,392 - root - INFO - Environment variables loaded
+2025-02-08 11:21:52,392 - root - INFO - TELEGRAM_BOT_TOKEN present: True
+2025-02-08 11:21:52,392 - root - INFO - OPENAI_API_KEY present: True
+2025-02-08 11:21:52,392 - root - INFO - SUPABASE_URL present: True
+2025-02-08 11:21:52,392 - root - INFO - === Starting Database Service Test ===
+2025-02-08 11:21:52,392 - trading_bot.services.database.db - ERROR - Failed to connect to Supabase: Client.__init__() got an unexpected keyword argument 'proxy'
+2025-02-08 11:21:52,393 - root - ERROR - Error in database test
+Traceback (most recent call last):
+  File "/Users/jovannitilborg/Desktop/Databases/trading_bot/test_services.py", line 79, in test_database
+    db = Database()
+  File "/Users/jovannitilborg/Desktop/Databases/trading_bot/services/database/db.py", line 20, in __init__
+    self.supabase = create_client(supabase_url, supabase_key)
+                    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/client.py", line 332, in create_client
+    return SyncClient.create(
+           ~~~~~~~~~~~~~~~~~^
+        supabase_url=supabase_url, supabase_key=supabase_key, options=options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/client.py", line 102, in create
+    client = cls(supabase_url, supabase_key, options)
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/client.py", line 80, in __init__
+    self.auth = self._init_supabase_auth_client(
+                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        auth_url=self.auth_url,
+        ^^^^^^^^^^^^^^^^^^^^^^^
+        client_options=options,
+        ^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/client.py", line 243, in _init_supabase_auth_client
+    return SyncSupabaseAuthClient(
+        url=auth_url,
+    ...<5 lines>...
+        verify=verify,
+    )
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/auth_client.py", line 32, in __init__
+    SyncGoTrueClient.__init__(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self,
+        ^^^^^
+    ...<8 lines>...
+        verify=verify,
+        ^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/gotrue/_sync/gotrue_client.py", line 101, in __init__
+    SyncGoTrueBaseAPI.__init__(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self,
+        ^^^^^
+    ...<4 lines>...
+        proxy=proxy,
+        ^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/gotrue/_sync/gotrue_base_api.py", line 28, in __init__
+    self._http_client = http_client or SyncClient(
+                                       ~~~~~~~~~~^
+        verify=bool(verify),
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<2 lines>...
+        http2=True,
+        ^^^^^^^^^^^
+    )
+    ^
+TypeError: Client.__init__() got an unexpected keyword argument 'proxy'
+2025-02-08 11:21:52,398 - root - INFO - === Starting News AI Service Test ===
+2025-02-08 11:21:52,398 - trading_bot.services.database.db - ERROR - Failed to connect to Supabase: Client.__init__() got an unexpected keyword argument 'proxy'
+2025-02-08 11:21:52,398 - root - ERROR - Error in sentiment test
+Traceback (most recent call last):
+  File "/Users/jovannitilborg/Desktop/Databases/trading_bot/test_services.py", line 59, in test_sentiment
+    db = Database()
+  File "/Users/jovannitilborg/Desktop/Databases/trading_bot/services/database/db.py", line 20, in __init__
+    self.supabase = create_client(supabase_url, supabase_key)
+                    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/client.py", line 332, in create_client
+    return SyncClient.create(
+           ~~~~~~~~~~~~~~~~~^
+        supabase_url=supabase_url, supabase_key=supabase_key, options=options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/client.py", line 102, in create
+    client = cls(supabase_url, supabase_key, options)
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/client.py", line 80, in __init__
+    self.auth = self._init_supabase_auth_client(
+                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        auth_url=self.auth_url,
+        ^^^^^^^^^^^^^^^^^^^^^^^
+        client_options=options,
+        ^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/client.py", line 243, in _init_supabase_auth_client
+    return SyncSupabaseAuthClient(
+        url=auth_url,
+    ...<5 lines>...
+        verify=verify,
+    )
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/auth_client.py", line 32, in __init__
+    SyncGoTrueClient.__init__(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self,
+        ^^^^^
+    ...<8 lines>...
+        verify=verify,
+        ^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/gotrue/_sync/gotrue_client.py", line 101, in __init__
+    SyncGoTrueBaseAPI.__init__(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self,
+        ^^^^^
+    ...<4 lines>...
+        proxy=proxy,
+        ^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/gotrue/_sync/gotrue_base_api.py", line 28, in __init__
+    self._http_client = http_client or SyncClient(
+                                       ~~~~~~~~~~^
+        verify=bool(verify),
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<2 lines>...
+        http2=True,
+        ^^^^^^^^^^^
+    )
+    ^
+TypeError: Client.__init__() got an unexpected keyword argument 'proxy'
+2025-02-08 11:21:52,400 - root - INFO - === Starting Telegram Service Test ===
+2025-02-08 11:21:52,400 - trading_bot.services.database.db - ERROR - Failed to connect to Supabase: Client.__init__() got an unexpected keyword argument 'proxy'
+2025-02-08 11:21:52,400 - root - ERROR - Error in Telegram test
+Traceback (most recent call last):
+  File "/Users/jovannitilborg/Desktop/Databases/trading_bot/test_services.py", line 20, in test_telegram
+    db = Database()
+  File "/Users/jovannitilborg/Desktop/Databases/trading_bot/services/database/db.py", line 20, in __init__
+    self.supabase = create_client(supabase_url, supabase_key)
+                    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/client.py", line 332, in create_client
+    return SyncClient.create(
+           ~~~~~~~~~~~~~~~~~^
+        supabase_url=supabase_url, supabase_key=supabase_key, options=options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/client.py", line 102, in create
+    client = cls(supabase_url, supabase_key, options)
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/client.py", line 80, in __init__
+    self.auth = self._init_supabase_auth_client(
+                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        auth_url=self.auth_url,
+        ^^^^^^^^^^^^^^^^^^^^^^^
+        client_options=options,
+        ^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/client.py", line 243, in _init_supabase_auth_client
+    return SyncSupabaseAuthClient(
+        url=auth_url,
+    ...<5 lines>...
+        verify=verify,
+    )
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/auth_client.py", line 32, in __init__
+    SyncGoTrueClient.__init__(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self,
+        ^^^^^
+    ...<8 lines>...
+        verify=verify,
+        ^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/gotrue/_sync/gotrue_client.py", line 101, in __init__
+    SyncGoTrueBaseAPI.__init__(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self,
+        ^^^^^
+    ...<4 lines>...
+        proxy=proxy,
+        ^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/gotrue/_sync/gotrue_base_api.py", line 28, in __init__
+    self._http_client = http_client or SyncClient(
+                                       ~~~~~~~~~~^
+        verify=bool(verify),
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<2 lines>...
+        http2=True,
+        ^^^^^^^^^^^
+    )
+    ^
+TypeError: Client.__init__() got an unexpected keyword argument 'proxy'
+2025-02-08 11:26:20,673 - root - INFO - Logging setup complete
+2025-02-08 11:26:20,674 - root - INFO - Python version: 3.13.1 (main, Dec  3 2024, 17:59:52) [Clang 16.0.0 (clang-1600.0.26.4)]
+2025-02-08 11:26:20,674 - root - INFO - Current working directory: /Users/jovannitilborg/Desktop/Databases
+2025-02-08 11:26:20,674 - root - INFO - Logs directory: /Users/jovannitilborg/Desktop/Databases/trading_bot/logs
+2025-02-08 11:26:20,675 - asyncio - DEBUG - Using selector: KqueueSelector
+2025-02-08 11:26:20,677 - root - INFO - Environment variables loaded
+2025-02-08 11:26:20,677 - root - INFO - TELEGRAM_BOT_TOKEN present: True
+2025-02-08 11:26:20,677 - root - INFO - OPENAI_API_KEY present: True
+2025-02-08 11:26:20,677 - root - INFO - SUPABASE_URL present: True
+2025-02-08 11:26:20,677 - root - INFO - === Starting Database Service Test ===
+2025-02-08 11:26:20,677 - trading_bot.services.database.db - ERROR - Failed to connect to Supabase: 'dict' object has no attribute 'headers'
+2025-02-08 11:26:20,678 - root - ERROR - Error in database test
+Traceback (most recent call last):
+  File "/Users/jovannitilborg/Desktop/Databases/trading_bot/test_services.py", line 79, in test_database
+    db = Database()
+  File "/Users/jovannitilborg/Desktop/Databases/trading_bot/services/database/db.py", line 27, in __init__
+    self.supabase = create_client(supabase_url, supabase_key, options)
+                    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/client.py", line 332, in create_client
+    return SyncClient.create(
+           ~~~~~~~~~~~~~~~~~^
+        supabase_url=supabase_url, supabase_key=supabase_key, options=options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/client.py", line 101, in create
+    auth_header = options.headers.get("Authorization") if options else None
+                  ^^^^^^^^^^^^^^^
+AttributeError: 'dict' object has no attribute 'headers'
+2025-02-08 11:26:20,680 - root - INFO - === Starting News AI Service Test ===
+2025-02-08 11:26:20,680 - trading_bot.services.database.db - ERROR - Failed to connect to Supabase: 'dict' object has no attribute 'headers'
+2025-02-08 11:26:20,680 - root - ERROR - Error in sentiment test
+Traceback (most recent call last):
+  File "/Users/jovannitilborg/Desktop/Databases/trading_bot/test_services.py", line 59, in test_sentiment
+    db = Database()
+  File "/Users/jovannitilborg/Desktop/Databases/trading_bot/services/database/db.py", line 27, in __init__
+    self.supabase = create_client(supabase_url, supabase_key, options)
+                    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/client.py", line 332, in create_client
+    return SyncClient.create(
+           ~~~~~~~~~~~~~~~~~^
+        supabase_url=supabase_url, supabase_key=supabase_key, options=options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/client.py", line 101, in create
+    auth_header = options.headers.get("Authorization") if options else None
+                  ^^^^^^^^^^^^^^^
+AttributeError: 'dict' object has no attribute 'headers'
+2025-02-08 11:26:20,681 - root - INFO - === Starting Telegram Service Test ===
+2025-02-08 11:26:20,681 - trading_bot.services.database.db - ERROR - Failed to connect to Supabase: 'dict' object has no attribute 'headers'
+2025-02-08 11:26:20,681 - root - ERROR - Error in Telegram test
+Traceback (most recent call last):
+  File "/Users/jovannitilborg/Desktop/Databases/trading_bot/test_services.py", line 20, in test_telegram
+    db = Database()
+  File "/Users/jovannitilborg/Desktop/Databases/trading_bot/services/database/db.py", line 27, in __init__
+    self.supabase = create_client(supabase_url, supabase_key, options)
+                    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/client.py", line 332, in create_client
+    return SyncClient.create(
+           ~~~~~~~~~~~~~~~~~^
+        supabase_url=supabase_url, supabase_key=supabase_key, options=options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/client.py", line 101, in create
+    auth_header = options.headers.get("Authorization") if options else None
+                  ^^^^^^^^^^^^^^^
+AttributeError: 'dict' object has no attribute 'headers'
+2025-02-08 11:29:09,489 - root - INFO - Logging setup complete
+2025-02-08 11:29:09,490 - root - INFO - Python version: 3.13.1 (main, Dec  3 2024, 17:59:52) [Clang 16.0.0 (clang-1600.0.26.4)]
+2025-02-08 11:29:09,491 - root - INFO - Current working directory: /Users/jovannitilborg/Desktop/Databases
+2025-02-08 11:29:09,491 - root - INFO - Logs directory: /Users/jovannitilborg/Desktop/Databases/trading_bot/logs
+2025-02-08 11:29:09,492 - asyncio - DEBUG - Using selector: KqueueSelector
+2025-02-08 11:29:09,495 - root - INFO - Environment variables loaded
+2025-02-08 11:29:09,495 - root - INFO - TELEGRAM_BOT_TOKEN present: True
+2025-02-08 11:29:09,495 - root - INFO - OPENAI_API_KEY present: True
+2025-02-08 11:29:09,496 - root - INFO - SUPABASE_URL present: True
+2025-02-08 11:29:09,496 - root - INFO - === Starting Database Service Test ===
+2025-02-08 11:29:09,496 - trading_bot.services.database.db - ERROR - Failed to connect to Supabase: 'Options' object has no attribute 'storage'
+2025-02-08 11:29:09,498 - root - ERROR - Error in database test
+Traceback (most recent call last):
+  File "/Users/jovannitilborg/Desktop/Databases/trading_bot/test_services.py", line 79, in test_database
+    db = Database()
+  File "/Users/jovannitilborg/Desktop/Databases/trading_bot/services/database/db.py", line 28, in __init__
+    self.supabase = create_client(supabase_url, supabase_key, Options())
+                    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/client.py", line 332, in create_client
+    return SyncClient.create(
+           ~~~~~~~~~~~~~~~~~^
+        supabase_url=supabase_url, supabase_key=supabase_key, options=options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/client.py", line 102, in create
+    client = cls(supabase_url, supabase_key, options)
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/client.py", line 80, in __init__
+    self.auth = self._init_supabase_auth_client(
+                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        auth_url=self.auth_url,
+        ^^^^^^^^^^^^^^^^^^^^^^^
+        client_options=options,
+        ^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/client.py", line 247, in _init_supabase_auth_client
+    storage=client_options.storage,
+            ^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Options' object has no attribute 'storage'
+2025-02-08 11:29:09,502 - root - INFO - === Starting News AI Service Test ===
+2025-02-08 11:29:09,502 - trading_bot.services.database.db - ERROR - Failed to connect to Supabase: 'Options' object has no attribute 'storage'
+2025-02-08 11:29:09,502 - root - ERROR - Error in sentiment test
+Traceback (most recent call last):
+  File "/Users/jovannitilborg/Desktop/Databases/trading_bot/test_services.py", line 59, in test_sentiment
+    db = Database()
+  File "/Users/jovannitilborg/Desktop/Databases/trading_bot/services/database/db.py", line 28, in __init__
+    self.supabase = create_client(supabase_url, supabase_key, Options())
+                    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/client.py", line 332, in create_client
+    return SyncClient.create(
+           ~~~~~~~~~~~~~~~~~^
+        supabase_url=supabase_url, supabase_key=supabase_key, options=options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/client.py", line 102, in create
+    client = cls(supabase_url, supabase_key, options)
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/client.py", line 80, in __init__
+    self.auth = self._init_supabase_auth_client(
+                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        auth_url=self.auth_url,
+        ^^^^^^^^^^^^^^^^^^^^^^^
+        client_options=options,
+        ^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/client.py", line 247, in _init_supabase_auth_client
+    storage=client_options.storage,
+            ^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Options' object has no attribute 'storage'
+2025-02-08 11:29:09,503 - root - INFO - === Starting Telegram Service Test ===
+2025-02-08 11:29:09,504 - trading_bot.services.database.db - ERROR - Failed to connect to Supabase: 'Options' object has no attribute 'storage'
+2025-02-08 11:29:09,504 - root - ERROR - Error in Telegram test
+Traceback (most recent call last):
+  File "/Users/jovannitilborg/Desktop/Databases/trading_bot/test_services.py", line 20, in test_telegram
+    db = Database()
+  File "/Users/jovannitilborg/Desktop/Databases/trading_bot/services/database/db.py", line 28, in __init__
+    self.supabase = create_client(supabase_url, supabase_key, Options())
+                    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/client.py", line 332, in create_client
+    return SyncClient.create(
+           ~~~~~~~~~~~~~~~~~^
+        supabase_url=supabase_url, supabase_key=supabase_key, options=options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/client.py", line 102, in create
+    client = cls(supabase_url, supabase_key, options)
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/client.py", line 80, in __init__
+    self.auth = self._init_supabase_auth_client(
+                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        auth_url=self.auth_url,
+        ^^^^^^^^^^^^^^^^^^^^^^^
+        client_options=options,
+        ^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jovannitilborg/Desktop/Databases/.venv/lib/python3.13/site-packages/supabase/_sync/client.py", line 247, in _init_supabase_auth_client
+    storage=client_options.storage,
+            ^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Options' object has no attribute 'storage'

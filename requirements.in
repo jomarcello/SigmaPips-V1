@@ -1,0 +1,36 @@
+# Core dependencies
+python-telegram-bot==20.5
+python-dotenv
+redis
+httpx~=0.24.0
+certifi
+supabase==1.0.3
+postgrest
+openai
+fastapi
+uvicorn
+
+# Data processing
+python-dateutil
+pytz
+pandas
+numpy
+
+# Web scraping & automation
+playwright
+beautifulsoup4
+requests
+
+# Database
+SQLAlchemy
+alembic
+Flask-SQLAlchemy
+Flask-Migrate
+
+# AI & ML
+matplotlib
+pillow
+
+# Development tools
+python-semantic-release
+python-gitlab

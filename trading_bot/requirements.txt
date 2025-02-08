@@ -1,0 +1,27 @@
+# Core dependencies
+python-telegram-bot==20.7
+python-dotenv==1.0.0
+redis==5.0.1
+httpx==0.25.2
+certifi==2024.2.2
+
+# Database
+supabase>=2.8.0
+postgrest>=0.10.6
+
+# AI/ML
+openai>=1.0.0,<2.0.0
+
+# Web framework (voor Railway)
+fastapi>=0.68.1
+uvicorn>=0.15.0
+
+# Utilities
+python-dateutil>=2.8.2
+pytz>=2023.3
+
+# Voor Railway deployment
+gunicorn>=20.1.0
+
+# Chart generation
+selenium==4.9.0 

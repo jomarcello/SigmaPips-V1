@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "tradingbot"
+version = "0.1.0"
+description = "Trading Signal Bot"
+authors = ["Your Name <your.email@example.com>"]
+packages = [{include = "app"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.109.0"
+python-telegram-bot = "^20.7"
+supabase = "^2.3.1"
+redis = "^5.0.1"
+uvicorn = "^0.27.0.post1"
+python-dotenv = "^1.0.1"
+selenium = "^4.28.1"
+pillow = "^11.1.0"
+webdriver-manager = "^4.0.2"
+aiohttp = "^3.11.12"
+beautifulsoup4 = "^4.13.3"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
