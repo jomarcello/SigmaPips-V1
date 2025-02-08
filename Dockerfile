@@ -7,18 +7,17 @@ WORKDIR /app
 # Install poetry
 RUN pip install poetry
 
-# Copy only dependency files first
+# Copy dependency files first
 COPY pyproject.toml poetry.lock ./
 
-# Copy the app directory first
-COPY ./app ./app/
+# Configure poetry
+RUN poetry config virtualenvs.create false
 
-# Copy the rest of the application code
+# Install dependencies
+RUN poetry install --no-interaction --no-ansi
+
+# Copy application code
 COPY . .
-
-# Configure poetry and install dependencies
-RUN poetry config virtualenvs.create false \
-    && poetry install --no-interaction --no-ansi
 
 # Expose port
 EXPOSE 9001
