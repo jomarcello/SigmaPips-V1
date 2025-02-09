@@ -6,6 +6,6 @@ app = FastAPI()
 
 @app.get("/health")
 async def health_check():
-    return {"status": "ok"}
+    return {"status": "healthy"}
 
-# Verwijder __main__ block omdat Railway uvicorn direct start 
+# Verwijder __main__ block omdat Railway uvicorn direct start
