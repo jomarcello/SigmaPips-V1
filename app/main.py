@@ -1,5 +1,5 @@
-from fastapi import FastAPI
 import os
+from fastapi import FastAPI
 
 # Initialize FastAPI met basis configuratie
 app = FastAPI()
@@ -8,4 +8,7 @@ app = FastAPI()
 async def health_check():
     return {"status": "healthy"}
 
-# Verwijder __main__ block omdat Railway uvicorn direct start
+if __name__ == "__main__":
+    port = int(os.getenv("PORT", 8000))
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=port)
