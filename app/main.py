@@ -1,9 +1,10 @@
 import os
 import logging
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, BackgroundTasks
 from telegram.ext import ApplicationBuilder, CommandHandler
 from dotenv import load_dotenv
 from telegram import Update
+import asyncio
 
 # Set up logging
 logging.basicConfig(
@@ -27,43 +28,29 @@ application = ApplicationBuilder().token(bot_token).build()
 async def health_check():
     return {"status": "healthy"}
 
+async def process_telegram_update(data: dict):
+    """Process Telegram update in the background"""
+    try:
+        chat_id = data.get('message', {}).get('chat', {}).get('id')
+        if chat_id:
+            logger.info(f"Processing message for chat_id: {chat_id}")
+            await application.bot.send_message(
+                chat_id=chat_id,
+                text="Test message received! 🚀"
+            )
+            logger.info("Message sent successfully")
+    except Exception as e:
+        logger.error(f"Error processing update: {e}")
+
 @app.post("/webhook")
-async def webhook(request: Request):
+async def webhook(request: Request, background_tasks: BackgroundTasks):
     """Handle incoming Telegram updates via webhook"""
     try:
-        logger.info("Webhook called")
-        
-        # Basic response first to prevent timeout
-        response = {"ok": True, "message": "Processing webhook"}
-        
-        try:
-            # Try to get the data
-            data = await request.json()
-            logger.info(f"Received data: {data}")
-            
-            # Only try to send message if we have the required data
-            if data.get('message', {}).get('chat', {}).get('id'):
-                chat_id = data['message']['chat']['id']
-                logger.info(f"Sending test message to chat_id: {chat_id}")
-                
-                try:
-                    await application.bot.send_message(
-                        chat_id=chat_id,
-                        text="Test message received! 🚀"
-                    )
-                    logger.info("Message sent successfully")
-                except Exception as msg_error:
-                    logger.error(f"Error sending message: {msg_error}")
-                    
-        except Exception as data_error:
-            logger.error(f"Error processing data: {data_error}")
-            
-        # Always return success to prevent retries
-        return response
-        
+        # Return response immediately
+        background_tasks.add_task(process_telegram_update, await request.json())
+        return {"ok": True, "message": "Update accepted"}
     except Exception as e:
-        logger.error(f"Critical webhook error: {e}")
-        # Still return 200 to prevent Telegram retries
+        logger.error(f"Webhook error: {e}")
         return {"ok": False, "error": str(e)}
 
 @app.on_event("startup")
