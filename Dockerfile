@@ -39,8 +39,9 @@ RUN pip install "poetry==$POETRY_VERSION" && \
 WORKDIR /app
 RUN pwd && ls -la
 
-# Kopieer alleen poetry files
-COPY pyproject.toml poetry.lock* ./
+# Kopieer alleen de app directory
+COPY app/ ./app/
+COPY pyproject.toml poetry.lock ./
 
 # Debug: Toon poetry files
 RUN ls -la && \
@@ -50,15 +51,12 @@ RUN ls -la && \
 # Regenerate the lock file
 RUN poetry lock --no-update
 
-# Installeer dependencies met extra logging
+# Installeer dependencies
 RUN poetry install --only main --no-root --no-interaction --verbose
-
-# Kopieer applicatiecode
-COPY . .
 
 # Debug: Toon finale structuur
 RUN ls -la && \
     tree . || true
 
-# Start commando
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "9001"]
+# Start commando met logging
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "9001", "--log-level", "debug"]

@@ -117,14 +117,8 @@ async def analyze_sentiment(data: dict):
 
 @app.get("/health")
 async def health_check():
-    return {
-        "status": "healthy",
-        "service": "market-sentiment",
-        "config": {
-            "news_sources": list(Config.NEWS_SOURCES.keys()),
-            "calendar_range": f"{Config.CALENDAR_LOOKBACK_DAYS}-{Config.CALENDAR_LOOKAHEAD_DAYS} days"
-        }
-    }
+    logger.info("Health check called")
+    return {"status": "healthy"}
 
 if __name__ == "__main__":
     import uvicorn
