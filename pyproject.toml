@@ -4,7 +4,7 @@ version = "1.0.0"
 description = "TradingView signal processor for Telegram"
 authors = ["Your Name <your.email@example.com>"]
 packages = [
-    { include = "app" }
+    { include = "app", from = "app" }
 ]
 
 [tool.poetry.dependencies]

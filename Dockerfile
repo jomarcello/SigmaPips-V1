@@ -43,5 +43,8 @@ RUN poetry install --only main --no-interaction --no-ansi
 # Kopieer applicatiecode
 COPY . .
 
+# Maak de app directory aan
+RUN mkdir -p /app/app
+
 # Start commando
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "9001"]
