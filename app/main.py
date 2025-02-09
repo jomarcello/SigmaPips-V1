@@ -61,28 +61,29 @@ async def health():
 async def webhook(request: Request):
     """Handle webhook updates"""
     try:
-        # Log request details
+        # Log basic info first
         logger.info("Webhook called")
-        logger.info(f"Headers: {request.headers}")
         
-        # Get and log request body
-        body = await request.body()
-        logger.info(f"Raw body: {body}")
+        # Return response immediately to prevent timeout
+        response = {"ok": True}
         
-        # Parse JSON
-        data = await request.json()
-        logger.info(f"Parsed data: {data}")
+        try:
+            # Process update in background
+            data = await request.json()
+            logger.info(f"Received update: {data}")
+            
+            # Create and process update
+            if update := Update.de_json(data, bot):
+                await application.process_update(update)
+                logger.info("Update processed successfully")
+            
+        except Exception as e:
+            logger.error(f"Error processing update: {e}", exc_info=True)
         
-        # Create update object
-        update = Update.de_json(data, bot)
-        if update:
-            logger.info(f"Created Update object: {update}")
-            await application.process_update(update)
-            logger.info("Update processed")
+        return response
         
-        return {"ok": True}
     except Exception as e:
-        logger.error(f"Webhook error: {e}", exc_info=True)
+        logger.error(f"Critical webhook error: {e}", exc_info=True)
         return {"ok": False, "error": str(e)}
 
 if __name__ == "__main__":
