@@ -34,14 +34,21 @@ async def webhook(request: Request):
         data = await request.json()
         logger.info(f"Received webhook update: {data}")
         
-        # Verwerk de update direct
+        # Log meer details
+        logger.info("Converting update to object...")
         update = Update.de_json(data, application.bot)
+        logger.info(f"Update object created: {update}")
+        
+        logger.info("Processing update...")
         await application.process_update(update)
+        logger.info("Update processed successfully")
         
         return {"ok": True}
     except Exception as e:
-        logger.error(f"Error in webhook handler: {str(e)}")
-        # Return 200 OK to prevent Telegram from retrying
+        logger.error(f"Error in webhook handler: {str(e)}", exc_info=True)
+        # Log de volledige stacktrace
+        import traceback
+        logger.error(traceback.format_exc())
         return {"ok": False, "error": str(e)}
 
 @app.on_event("startup")
@@ -51,10 +58,24 @@ async def startup_event():
         logger.info("Starting bot...")
         await application.initialize()
         
-        # Set webhook URL
+        # Delete existing webhook first
+        logger.info("Deleting existing webhook...")
+        await application.bot.delete_webhook()
+        
+        # Set new webhook URL with allowed updates
         webhook_url = "https://sigmapips-v1-production.up.railway.app/webhook"
-        await application.bot.set_webhook(url=webhook_url)
-        logger.info(f"Webhook set to {webhook_url}")
+        logger.info(f"Setting webhook to {webhook_url}")
+        
+        result = await application.bot.set_webhook(
+            url=webhook_url,
+            allowed_updates=['message', 'callback_query'],
+            drop_pending_updates=True  # Dit verwijdert oude updates
+        )
+        
+        if result:
+            logger.info("Webhook setup successful!")
+        else:
+            logger.error("Webhook setup failed!")
         
         # Add handlers
         application.add_handler(CommandHandler("start", start_command))
@@ -74,8 +95,16 @@ async def shutdown_event():
 
 async def start_command(update, context):
     """Handle the /start command"""
-    logger.info(f"Received /start command from user {update.effective_user.id}")
-    await update.message.reply_text('Bot is running! 🚀')
+    try:
+        user = update.effective_user
+        logger.info(f"Processing /start command from user {user.id}")
+        
+        message = await update.message.reply_text('Bot is running! 🚀')
+        logger.info(f"Start message sent: {message.message_id}")
+        
+    except Exception as e:
+        logger.error(f"Error in start command: {str(e)}", exc_info=True)
+        await update.message.reply_text("Sorry, something went wrong!")
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 8000))
