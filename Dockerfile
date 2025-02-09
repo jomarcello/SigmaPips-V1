@@ -7,7 +7,11 @@ ENV PYTHONUNBUFFERED=1 \
     POETRY_VERSION=1.7.1 \
     CHROME_BIN=/usr/bin/chromium \
     CHROME_PATH=/usr/lib/chromium/ \
-    PLAYWRIGHT_BROWSERS_PATH=/usr/bin/chromium
+    PLAYWRIGHT_BROWSERS_PATH=/usr/bin/chromium \
+    POETRY_VIRTUALENVS_CREATE=false \
+    # Voeg debug logging toe
+    POETRY_VERBOSE=1 \
+    PYTHONVERBOSE=1
 
 # Installeer system dependencies voor Chromium
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -21,27 +25,40 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libxtst6 \
     libgtk-3-0 \
     libgbm1 \
+    # Debug tools
+    procps \
     # Schoon op na installatie
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Installeer Poetry
-RUN pip install "poetry==$POETRY_VERSION"
+# Installeer Poetry met specifieke versie check
+RUN pip install "poetry==$POETRY_VERSION" && \
+    poetry --version
 
-# Configureer Poetry
-RUN poetry config virtualenvs.create false
-
-# Werkdirectory
+# Debug: Toon werkdirectory
 WORKDIR /app
+RUN pwd && ls -la
 
-# Kopieer dependencies
+# Kopieer alleen poetry files
 COPY pyproject.toml poetry.lock* ./
 
-# Installeer dependencies zonder het hoofdproject
-RUN poetry install --only main --no-root --no-interaction --no-ansi
+# Debug: Toon poetry files
+RUN ls -la && \
+    poetry check && \
+    poetry env info
+
+# Regenerate the lock file
+RUN poetry lock --no-update
+
+# Installeer dependencies met extra logging
+RUN poetry install --only main --no-root --no-interaction --verbose
 
 # Kopieer applicatiecode
 COPY . .
+
+# Debug: Toon finale structuur
+RUN ls -la && \
+    tree . || true
 
 # Start commando
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "9001"]
