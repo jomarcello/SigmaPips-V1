@@ -1,31 +1,38 @@
 # Gebruik Python 3.11 als basis
 FROM python:3.11-slim
 
-# Zet omgevingsvariabelen om caching en logs te optimaliseren
+# Zet omgevingsvariabelen
 ENV PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=off \
     PIP_DISABLE_PIP_VERSION_CHECK=on \
-    PIP_DEFAULT_TIMEOUT=100
+    PIP_DEFAULT_TIMEOUT=100 \
+    PYTHONPATH=/app \
+    CHROME_BIN=/usr/bin/chromium \
+    CHROME_PATH=/usr/lib/chromium/
 
-# Installeer Chrome en andere dependencies
+# Installeer alleen de essentiële packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    curl build-essential chromium chromium-driver \
+    chromium \
+    chromium-driver \
+    && mkdir -p /app/logs \
+    && chmod 777 /app/logs \
     && rm -rf /var/lib/apt/lists/*
 
-# Installeer Poetry op een betrouwbare manier
+# Installeer Poetry
 RUN pip install --upgrade pip && pip install poetry==1.7.1
 
-# Stel de werkdirectory in
+# Stel werkdirectory in
 WORKDIR /app
 
-# Kopieer en installeer alleen de dependencies
+# Kopieer alleen dependency files
 COPY pyproject.toml poetry.lock* /app/
 
-# Zorg ervoor dat Poetry geen virtuele omgevingen maakt
-RUN poetry config virtualenvs.create false && poetry install --no-interaction --no-ansi --no-root
+# Installeer dependencies
+RUN poetry config virtualenvs.create false && \
+    poetry install --no-root --no-dev --no-interaction
 
-# Kopieer de rest van de bestanden
+# Kopieer code
 COPY . /app/
 
-# Start de applicatie via Uvicorn
+# Start app
 CMD ["poetry", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "9001"]

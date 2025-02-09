@@ -171,3 +171,11 @@ dist
 .pytest_cache
 .coverage
 htmlcov
+
+logs/
+.git/
+.env
+__pycache__/
+*.pyc
+venv/
+.DS_Store
