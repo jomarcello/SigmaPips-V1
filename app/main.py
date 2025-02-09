@@ -16,12 +16,16 @@ import sys
 # Eerst environment variables laden
 load_dotenv()
 
-# Dan pas debugging
-print("\n=== STARTUP DEBUGGING ===", file=sys.stderr)
+# Na de imports
+print("\n" + "!"*50, file=sys.stderr)
+print("STARTUP DEBUGGING", file=sys.stderr)
+print("!"*50, file=sys.stderr)
 print("Environment variables:", file=sys.stderr)
 for key in ["REDIS_URL", "SUPABASE_URL", "SUPABASE_KEY", "TELEGRAM_BOT_TOKEN"]:
-    print(f"{key}: {'✓ Set' if os.getenv(key) else '✗ Missing'}", file=sys.stderr)
-print("======================\n", file=sys.stderr)
+    value = os.getenv(key)
+    status = "✓ SET" if value else "✗ MISSING"
+    print(f"{key}: {status}", file=sys.stderr)
+print("!"*50 + "\n", file=sys.stderr)
 
 # Initialize FastAPI
 app = FastAPI(title="TradingBot API")
@@ -132,8 +136,9 @@ async def analyze_sentiment(data: dict):
 
 @app.get("/health")
 async def health_check():
-    """Basic health check that always returns healthy"""
-    print("\n=== HEALTH CHECK DEBUGGING ===", file=sys.stderr)
+    print("\n" + "!"*50, file=sys.stderr)
+    print("HEALTH CHECK", file=sys.stderr)
+    print("!"*50, file=sys.stderr)
     try:
         # Log environment status
         env_status = {

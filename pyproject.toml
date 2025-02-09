@@ -8,7 +8,7 @@ packages = []
 [tool.poetry.dependencies]
 python = "^3.11"
 fastapi = "^0.109.0"
-uvicorn = "^0.27.0"
+uvicorn = {extras = ["standard"], version = "^0.27.0"}
 python-telegram-bot = "^20.7"
 supabase = "^2.3.0"
 redis = "^5.0.1"
@@ -23,3 +23,6 @@ webdriver-manager = "^3.8.6"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+start = "uvicorn app.main:app --host 0.0.0.0 --port 9001 --log-level debug"
