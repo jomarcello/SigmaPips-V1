@@ -13,9 +13,15 @@ from app.config import Config
 import logging
 import sys
 
-# Load environment variables
+# Eerst environment variables laden
 load_dotenv()
-logger.info("Environment variables loaded")
+
+# Dan pas debugging
+print("\n=== STARTUP DEBUGGING ===", file=sys.stderr)
+print("Environment variables:", file=sys.stderr)
+for key in ["REDIS_URL", "SUPABASE_URL", "SUPABASE_KEY", "TELEGRAM_BOT_TOKEN"]:
+    print(f"{key}: {'✓ Set' if os.getenv(key) else '✗ Missing'}", file=sys.stderr)
+print("======================\n", file=sys.stderr)
 
 # Initialize FastAPI
 app = FastAPI(title="TradingBot API")
@@ -127,52 +133,45 @@ async def analyze_sentiment(data: dict):
 @app.get("/health")
 async def health_check():
     """Basic health check that always returns healthy"""
-    logger.debug("Health check called")
+    print("\n=== HEALTH CHECK DEBUGGING ===", file=sys.stderr)
     try:
-        # Check basic services
-        services_status = {
-            "supabase": "unknown",
-            "redis": "unknown",
-            "telegram": "unknown"
+        # Log environment status
+        env_status = {
+            "REDIS_URL": bool(os.getenv("REDIS_URL")),
+            "SUPABASE_URL": bool(os.getenv("SUPABASE_URL")),
+            "SUPABASE_KEY": bool(os.getenv("SUPABASE_KEY")),
+            "TELEGRAM_BOT_TOKEN": bool(os.getenv("TELEGRAM_BOT_TOKEN"))
         }
+        print("Environment variables status:", env_status, file=sys.stderr)
         
-        # Test Supabase
-        try:
-            supabase.table("signal_preferences").select("count").execute()
-            services_status["supabase"] = "healthy"
-        except Exception as e:
-            logger.warning(f"Supabase health check failed: {str(e)}")
-            services_status["supabase"] = "unhealthy"
-        
-        # Test Redis
+        # Check Redis
         try:
             redis_client.ping()
-            services_status["redis"] = "healthy"
+            print("Redis: Connected ✓", file=sys.stderr)
         except Exception as e:
-            logger.warning(f"Redis health check failed: {str(e)}")
-            services_status["redis"] = "unhealthy"
+            print(f"Redis Error: {str(e)}", file=sys.stderr)
             
-        # Test Telegram
+        # Check Supabase    
+        try:
+            supabase.table("signal_preferences").select("count").execute()
+            print("Supabase: Connected ✓", file=sys.stderr)
+        except Exception as e:
+            print(f"Supabase Error: {str(e)}", file=sys.stderr)
+            
+        # Check Telegram
         try:
             if telegram_app.bot:
-                services_status["telegram"] = "healthy"
+                print("Telegram: Connected ✓", file=sys.stderr)
         except Exception as e:
-            logger.warning(f"Telegram health check failed: {str(e)}")
-            services_status["telegram"] = "unhealthy"
+            print(f"Telegram Error: {str(e)}", file=sys.stderr)
             
-        return {
-            "status": "healthy",
-            "services": services_status,
-            "environment": {
-                "REDIS_URL": bool(os.getenv("REDIS_URL")),
-                "SUPABASE_URL": bool(os.getenv("SUPABASE_URL")),
-                "TELEGRAM_BOT_TOKEN": bool(os.getenv("TELEGRAM_BOT_TOKEN")),
-            }
-        }
+        print("========================\n", file=sys.stderr)
+        return {"status": "healthy"}
+        
     except Exception as e:
-        logger.error(f"Health check failed: {str(e)}")
-        # Return healthy anyway to prevent container restart
-        return {"status": "healthy", "message": "Basic health check"}
+        print(f"Health Check Failed: {str(e)}", file=sys.stderr)
+        print("========================\n", file=sys.stderr)
+        return {"status": "healthy", "error": str(e)}
 
 if __name__ == "__main__":
     import uvicorn
