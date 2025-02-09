@@ -15,7 +15,13 @@ COPY requirements.txt .
 # Installeer dependencies
 RUN pip install -r requirements.txt
 
-# Start commando via shell om environment variables te expanderen
-CMD uvicorn app.main:app --host 0.0.0.0 --port ${PORT} --proxy-headers --forwarded-allow-ips=* --root-path /
+# Expose port
+EXPOSE 8080
+
+# Use environment variables
+ENV PORT=8080
+
+# Start command
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]
 
 
