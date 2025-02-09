@@ -20,7 +20,7 @@ app = FastAPI()
 # Initialize Telegram bot
 bot_token = os.getenv("TELEGRAM_BOT_TOKEN")
 logger.info(f"Initializing bot with token: {bot_token[:5]}...")  # Log alleen eerste 5 karakters voor veiligheid
-bot = ApplicationBuilder().token(bot_token).build()
+application = ApplicationBuilder().token(bot_token).build()
 
 @app.get("/health")
 async def health_check():
@@ -31,7 +31,7 @@ async def webhook(request: Request):
     """Handle incoming Telegram updates via webhook"""
     data = await request.json()
     logger.info(f"Received webhook update: {data}")
-    await bot.update_queue.put(data)
+    await application.update_queue.put(data)
     return {"ok": True}
 
 @app.on_event("startup")
@@ -39,15 +39,15 @@ async def startup_event():
     """Start the bot when the FastAPI app starts"""
     try:
         logger.info("Starting bot...")
-        await bot.initialize()
+        await application.initialize()
         
         # Set webhook URL
         webhook_url = "https://sigmapips-v1-production.up.railway.app/webhook"
-        await bot.set_webhook(url=webhook_url)
+        await application.bot.set_webhook(url=webhook_url)
         logger.info(f"Webhook set to {webhook_url}")
         
         # Add handlers
-        bot.add_handler(CommandHandler("start", start_command))
+        application.add_handler(CommandHandler("start", start_command))
         logger.info("Added /start command handler")
         
         logger.info("Bot started successfully!")
@@ -59,7 +59,7 @@ async def startup_event():
 async def shutdown_event():
     """Stop the bot when the FastAPI app stops"""
     logger.info("Stopping bot...")
-    await bot.stop()
+    await application.stop()
     logger.info("Bot stopped!")
 
 async def start_command(update, context):
