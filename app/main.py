@@ -11,6 +11,7 @@ from app.services.signal_processor.models import TradingSignal
 from app.services.sentiment.analyzer import SentimentAnalyzer
 from app.config import Config
 import logging
+import sys
 
 # Load environment variables
 load_dotenv()
@@ -54,6 +55,14 @@ register_handlers(telegram_app)
 # Initialize services
 signal_processor = SignalProcessor()
 analyzer = SentimentAnalyzer()
+
+# Configure logging
+logger.setLevel(logging.DEBUG)
+handler = logging.StreamHandler(sys.stdout)
+handler.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
 
 @app.get("/")
 async def root():
@@ -117,8 +126,53 @@ async def analyze_sentiment(data: dict):
 
 @app.get("/health")
 async def health_check():
-    logger.info("Health check called")
-    return {"status": "healthy"}
+    """Basic health check that always returns healthy"""
+    logger.debug("Health check called")
+    try:
+        # Check basic services
+        services_status = {
+            "supabase": "unknown",
+            "redis": "unknown",
+            "telegram": "unknown"
+        }
+        
+        # Test Supabase
+        try:
+            supabase.table("signal_preferences").select("count").execute()
+            services_status["supabase"] = "healthy"
+        except Exception as e:
+            logger.warning(f"Supabase health check failed: {str(e)}")
+            services_status["supabase"] = "unhealthy"
+        
+        # Test Redis
+        try:
+            redis_client.ping()
+            services_status["redis"] = "healthy"
+        except Exception as e:
+            logger.warning(f"Redis health check failed: {str(e)}")
+            services_status["redis"] = "unhealthy"
+            
+        # Test Telegram
+        try:
+            if telegram_app.bot:
+                services_status["telegram"] = "healthy"
+        except Exception as e:
+            logger.warning(f"Telegram health check failed: {str(e)}")
+            services_status["telegram"] = "unhealthy"
+            
+        return {
+            "status": "healthy",
+            "services": services_status,
+            "environment": {
+                "REDIS_URL": bool(os.getenv("REDIS_URL")),
+                "SUPABASE_URL": bool(os.getenv("SUPABASE_URL")),
+                "TELEGRAM_BOT_TOKEN": bool(os.getenv("TELEGRAM_BOT_TOKEN")),
+            }
+        }
+    except Exception as e:
+        logger.error(f"Health check failed: {str(e)}")
+        # Return healthy anyway to prevent container restart
+        return {"status": "healthy", "message": "Basic health check"}
 
 if __name__ == "__main__":
     import uvicorn

@@ -58,5 +58,5 @@ RUN poetry install --only main --no-root --no-interaction --verbose
 RUN ls -la && \
     tree . || true
 
-# Start commando met logging
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "9001", "--log-level", "debug"]
+# Start commando met extra logging
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "9001", "--log-level", "debug", "--reload", "--reload-dir", "/app"]
