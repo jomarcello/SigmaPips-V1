@@ -1,6 +1,6 @@
 import os
 import logging
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from telegram.ext import ApplicationBuilder, CommandHandler
 from dotenv import load_dotenv
 
@@ -26,18 +26,31 @@ bot = ApplicationBuilder().token(bot_token).build()
 async def health_check():
     return {"status": "healthy"}
 
+@app.post("/webhook")
+async def webhook(request: Request):
+    """Handle incoming Telegram updates via webhook"""
+    data = await request.json()
+    logger.info(f"Received webhook update: {data}")
+    await bot.update_queue.put(data)
+    return {"ok": True}
+
 @app.on_event("startup")
 async def startup_event():
     """Start the bot when the FastAPI app starts"""
     try:
         logger.info("Starting bot...")
         await bot.initialize()
-        await bot.start()
-        logger.info("Bot started successfully!")
+        
+        # Set webhook URL
+        webhook_url = "https://sigmapips-v1-production.up.railway.app/webhook"
+        await bot.set_webhook(url=webhook_url)
+        logger.info(f"Webhook set to {webhook_url}")
         
         # Add handlers
         bot.add_handler(CommandHandler("start", start_command))
         logger.info("Added /start command handler")
+        
+        logger.info("Bot started successfully!")
     except Exception as e:
         logger.error(f"Error starting bot: {e}")
         raise
