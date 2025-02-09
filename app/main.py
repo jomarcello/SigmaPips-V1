@@ -31,24 +31,39 @@ async def health_check():
 async def webhook(request: Request):
     """Handle incoming Telegram updates via webhook"""
     try:
+        # Log raw request first
+        body = await request.body()
+        logger.info(f"Raw webhook body: {body}")
+        
+        # Parse JSON
         data = await request.json()
-        logger.info(f"Received webhook update: {data}")
+        logger.info(f"Parsed webhook data: {data}")
         
-        # Log meer details
-        logger.info("Converting update to object...")
+        # Validate update structure
+        if not isinstance(data, dict):
+            logger.error(f"Invalid update format: {data}")
+            return {"ok": False, "error": "Invalid update format"}
+            
+        # Create update object
+        logger.info("Creating Update object...")
         update = Update.de_json(data, application.bot)
-        logger.info(f"Update object created: {update}")
         
+        if update is None:
+            logger.error("Failed to create Update object")
+            return {"ok": False, "error": "Failed to create Update object"}
+            
+        logger.info(f"Created Update object: {update}")
+        
+        # Process update
         logger.info("Processing update...")
         await application.process_update(update)
         logger.info("Update processed successfully")
         
-        return {"ok": True}
+        return {"ok": True, "message": "Update processed successfully"}
+        
     except Exception as e:
         logger.error(f"Error in webhook handler: {str(e)}", exc_info=True)
-        # Log de volledige stacktrace
-        import traceback
-        logger.error(traceback.format_exc())
+        # Always return 200 to prevent Telegram retries
         return {"ok": False, "error": str(e)}
 
 @app.on_event("startup")
