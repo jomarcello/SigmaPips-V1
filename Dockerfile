@@ -7,9 +7,10 @@ ENV PYTHONUNBUFFERED=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=on \
     PIP_DEFAULT_TIMEOUT=100
 
-# Installeer essentiële packages zonder onnodige dependencies
+# Installeer Chrome en andere dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    curl build-essential && rm -rf /var/lib/apt/lists/*
+    curl build-essential chromium chromium-driver \
+    && rm -rf /var/lib/apt/lists/*
 
 # Installeer Poetry op een betrouwbare manier
 RUN pip install --upgrade pip && pip install poetry==1.7.1
@@ -17,7 +18,7 @@ RUN pip install --upgrade pip && pip install poetry==1.7.1
 # Stel de werkdirectory in
 WORKDIR /app
 
-# Kopieer en installeer alleen de dependencies (gebruikt cache optimaal)
+# Kopieer en installeer alleen de dependencies
 COPY pyproject.toml poetry.lock* /app/
 
 # Zorg ervoor dat Poetry geen virtuele omgevingen maakt
