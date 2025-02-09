@@ -3,6 +3,7 @@ import logging
 from fastapi import FastAPI, Request
 from telegram.ext import ApplicationBuilder, CommandHandler
 from dotenv import load_dotenv
+from telegram import Update
 
 # Set up logging
 logging.basicConfig(
@@ -29,10 +30,19 @@ async def health_check():
 @app.post("/webhook")
 async def webhook(request: Request):
     """Handle incoming Telegram updates via webhook"""
-    data = await request.json()
-    logger.info(f"Received webhook update: {data}")
-    await application.update_queue.put(data)
-    return {"ok": True}
+    try:
+        data = await request.json()
+        logger.info(f"Received webhook update: {data}")
+        
+        # Verwerk de update direct
+        update = Update.de_json(data, application.bot)
+        await application.process_update(update)
+        
+        return {"ok": True}
+    except Exception as e:
+        logger.error(f"Error in webhook handler: {str(e)}")
+        # Return 200 OK to prevent Telegram from retrying
+        return {"ok": False, "error": str(e)}
 
 @app.on_event("startup")
 async def startup_event():
