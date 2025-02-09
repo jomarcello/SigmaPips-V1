@@ -12,10 +12,9 @@ ENV PYTHONUNBUFFERED=1 \
 
 # Installeer alleen de essentiële packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
     chromium \
     chromium-driver \
-    && mkdir -p /app/logs \
-    && chmod 777 /app/logs \
     && rm -rf /var/lib/apt/lists/*
 
 # Installeer Poetry
@@ -27,9 +26,9 @@ WORKDIR /app
 # Kopieer alleen dependency files
 COPY pyproject.toml poetry.lock* /app/
 
-# Installeer dependencies
+# Installeer dependencies zonder dev dependencies
 RUN poetry config virtualenvs.create false && \
-    poetry install --no-root --no-dev --no-interaction
+    poetry install --no-root --no-interaction
 
 # Kopieer code
 COPY . /app/
