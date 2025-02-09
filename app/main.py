@@ -1,6 +1,6 @@
 import os
 import logging
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, BackgroundTasks
 from telegram import Bot, Update
 from telegram.ext import Application, CommandHandler
 
@@ -57,33 +57,33 @@ async def health():
     logger.info("Health check called")
     return {"status": "ok"}
 
+async def process_telegram_update(data: dict):
+    """Process Telegram update in background"""
+    try:
+        if update := Update.de_json(data, bot):
+            await application.process_update(update)
+            logger.info("Update processed successfully")
+    except Exception as e:
+        logger.error(f"Background task error: {e}", exc_info=True)
+
 @app.post("/webhook")
-async def webhook(request: Request):
+async def webhook(request: Request, background_tasks: BackgroundTasks):
     """Handle webhook updates"""
     try:
-        # Log basic info first
+        # Log and return immediately
         logger.info("Webhook called")
         
-        # Return response immediately to prevent timeout
-        response = {"ok": True}
+        # Get data
+        data = await request.json()
+        logger.info("Received webhook data")
         
-        try:
-            # Process update in background
-            data = await request.json()
-            logger.info(f"Received update: {data}")
-            
-            # Create and process update
-            if update := Update.de_json(data, bot):
-                await application.process_update(update)
-                logger.info("Update processed successfully")
-            
-        except Exception as e:
-            logger.error(f"Error processing update: {e}", exc_info=True)
+        # Add to background tasks
+        background_tasks.add_task(process_telegram_update, data)
+        logger.info("Added update to background tasks")
         
-        return response
-        
+        return {"ok": True}
     except Exception as e:
-        logger.error(f"Critical webhook error: {e}", exc_info=True)
+        logger.error(f"Webhook error: {e}", exc_info=True)
         return {"ok": False, "error": str(e)}
 
 if __name__ == "__main__":
