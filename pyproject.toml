@@ -3,9 +3,7 @@ name = "sigmapips"
 version = "1.0.0"
 description = "TradingView signal processor for Telegram"
 authors = ["Your Name <your.email@example.com>"]
-packages = [
-    { include = "app", from = "app" }
-]
+packages = []
 
 [tool.poetry.dependencies]
 python = "^3.11"
