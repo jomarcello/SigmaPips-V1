@@ -178,6 +178,46 @@ async def health_check():
         print("========================\n", file=sys.stderr)
         return {"status": "healthy", "error": str(e)}
 
+@app.get("/debug")
+async def debug_status():
+    """Simple debug endpoint to check environment and connections"""
+    status = {
+        "environment": {
+            "REDIS_URL": bool(os.getenv("REDIS_URL")),
+            "SUPABASE_URL": bool(os.getenv("SUPABASE_URL")), 
+            "SUPABASE_KEY": bool(os.getenv("SUPABASE_KEY")),
+            "TELEGRAM_BOT_TOKEN": bool(os.getenv("TELEGRAM_BOT_TOKEN"))
+        },
+        "connections": {
+            "redis": "unknown",
+            "supabase": "unknown",
+            "telegram": "unknown"
+        }
+    }
+    
+    # Test Redis
+    try:
+        redis_client.ping()
+        status["connections"]["redis"] = "connected"
+    except:
+        status["connections"]["redis"] = "failed"
+        
+    # Test Supabase
+    try:
+        supabase.table("signal_preferences").select("count").execute()
+        status["connections"]["supabase"] = "connected"
+    except:
+        status["connections"]["supabase"] = "failed"
+        
+    # Test Telegram
+    try:
+        if telegram_app.bot:
+            status["connections"]["telegram"] = "connected"
+    except:
+        status["connections"]["telegram"] = "failed"
+        
+    return status
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=5000) 
