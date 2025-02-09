@@ -7,6 +7,5 @@ restartPolicyType = "on_failure"
 healthcheckPath = "/health"
 healthcheckTimeout = 10
 
-[http]
-internal_port = 8080
-external_port = 443
+[service]
+internal_port = "8080"

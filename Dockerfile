@@ -18,11 +18,10 @@ RUN pip install -r requirements.txt
 # Expose the port that Railway expects
 EXPOSE 8080
 
-# Start command with proxy headers for Railway
-CMD uvicorn app.main:app \
-    --host 0.0.0.0 \
-    --port 8080 \
-    --proxy-headers \
-    --forwarded-allow-ips='*'
+# Set environment variables
+ENV PORT=8080
+
+# Start command
+CMD ["python", "-m", "app.main"]
 
 
