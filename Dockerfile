@@ -54,5 +54,5 @@ RUN poetry install --only main --no-root --no-interaction --verbose
 # Debug: Toon finale structuur
 RUN ls -la
 
-# Start commando met extra logging
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "9001", "--log-level", "debug", "--reload", "--reload-dir", "/app"]
+# Start commando zonder reload (dat kan problemen veroorzaken in productie)
+CMD ["poetry", "run", "start"]
