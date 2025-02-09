@@ -31,9 +31,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Installeer Poetry met specifieke versie check
+# Installeer Poetry met specifieke versie check en configuratie
 RUN pip install "poetry==$POETRY_VERSION" && \
-    poetry --version
+    poetry config virtualenvs.create false && \
+    poetry config installer.max-workers 10
 
 # Debug: Toon werkdirectory
 WORKDIR /app
@@ -48,11 +49,11 @@ RUN ls -la && \
     cat pyproject.toml && \
     poetry check --no-interaction || true
 
-# Installeer dependencies zonder het hoofdproject
-RUN poetry install --only main --no-root --no-interaction --verbose
+# Installeer dependencies direct zonder poetry
+RUN pip install --no-cache-dir fastapi uvicorn[standard] python-telegram-bot python-dotenv
 
 # Debug: Toon finale structuur
 RUN ls -la
 
-# Start commando zonder reload (dat kan problemen veroorzaken in productie)
-CMD ["poetry", "run", "start"]
+# Start commando direct met uvicorn
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "$PORT", "--proxy-headers", "--forwarded-allow-ips=*", "--root-path", "/"]
