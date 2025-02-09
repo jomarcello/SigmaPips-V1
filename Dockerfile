@@ -1,43 +1,30 @@
-# Use Python 3.11
+# Gebruik Python 3.11 als basis
 FROM python:3.11-slim
 
-# Set environment variables
+# Zet omgevingsvariabelen om caching en logs te optimaliseren
 ENV PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=off \
     PIP_DISABLE_PIP_VERSION_CHECK=on \
-    POETRY_VERSION=1.7.1 \
-    POETRY_HOME="/opt/poetry" \
-    POETRY_VIRTUALENVS_CREATE=false \
-    POETRY_NO_INTERACTION=1
+    PIP_DEFAULT_TIMEOUT=100
 
-# Add Poetry to PATH
-ENV PATH="$POETRY_HOME/bin:$PATH"
+# Installeer essentiële packages zonder onnodige dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl build-essential && rm -rf /var/lib/apt/lists/*
 
-# Install system dependencies
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-        curl \
-        build-essential \
-    && rm -rf /var/lib/apt/lists/*
+# Installeer Poetry op een betrouwbare manier
+RUN pip install --upgrade pip && pip install poetry==1.7.1
 
-# Install Poetry
-RUN curl -sSL https://install.python-poetry.org | python3 -
-
-# Set working directory
+# Stel de werkdirectory in
 WORKDIR /app
 
-# Copy dependency files
-COPY pyproject.toml poetry.lock ./
+# Kopieer en installeer alleen de dependencies (gebruikt cache optimaal)
+COPY pyproject.toml poetry.lock* /app/
 
-# Install dependencies
-RUN poetry install --no-root --no-interaction --no-ansi
+# Zorg ervoor dat Poetry geen virtuele omgevingen maakt
+RUN poetry config virtualenvs.create false && poetry install --no-interaction --no-ansi --no-root
 
-# Copy application code
-COPY . .
+# Kopieer de rest van de bestanden
+COPY . /app/
 
-# Expose port
-EXPOSE 9001
-
-# Command to run the application
+# Start de applicatie via Uvicorn
 CMD ["poetry", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "9001"]
