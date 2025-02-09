@@ -1,37 +1,44 @@
-# Gebruik een lichtere basis image
+# Gebruik officiële Python image
 FROM python:3.11-slim-bookworm
 
-# Zet omgevingsvariabelen
+# Zet vereiste environment variables
 ENV PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1 \
     POETRY_VERSION=1.7.1 \
     CHROME_BIN=/usr/bin/chromium \
-    CHROME_PATH=/usr/lib/chromium/
+    CHROME_PATH=/usr/lib/chromium/ \
+    PLAYWRIGHT_BROWSERS_PATH=/usr/bin/chromium
 
-# Installeer alleen noodzakelijke system dependencies
+# Installeer system dependencies voor Chromium
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     chromium \
     chromium-driver \
-    # Clean up apt cache
+    # Benodigde libraries voor Chromium
+    libnss3 \
+    libxss1 \
+    libasound2 \
+    libxtst6 \
+    libgtk-3-0 \
+    libgbm1 \
+    # Schoon op na installatie
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
 # Installeer Poetry
 RUN pip install "poetry==$POETRY_VERSION"
 
-# Configureer Poetry om geen virtuele omgeving te maken
+# Configureer Poetry
 RUN poetry config virtualenvs.create false
 
-# Stel werkdirectory in
+# Werkdirectory
 WORKDIR /app
 
-# Kopieer dependency files
+# Kopieer dependencies
 COPY pyproject.toml poetry.lock* ./
 
-# Installeer dependencies
-RUN poetry install --no-root --no-interaction --no-ansi
+# Installeer Python dependencies
+RUN poetry install --only main --no-interaction --no-ansi
 
 # Kopieer applicatiecode
 COPY . .
