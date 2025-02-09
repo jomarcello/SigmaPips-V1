@@ -31,39 +31,39 @@ async def health_check():
 async def webhook(request: Request):
     """Handle incoming Telegram updates via webhook"""
     try:
-        # Log raw request first
-        body = await request.body()
-        logger.info(f"Raw webhook body: {body}")
+        logger.info("Webhook called")
         
-        # Parse JSON
-        data = await request.json()
-        logger.info(f"Parsed webhook data: {data}")
+        # Basic response first to prevent timeout
+        response = {"ok": True, "message": "Processing webhook"}
         
-        # Validate update structure
-        if not isinstance(data, dict):
-            logger.error(f"Invalid update format: {data}")
-            return {"ok": False, "error": "Invalid update format"}
+        try:
+            # Try to get the data
+            data = await request.json()
+            logger.info(f"Received data: {data}")
             
-        # Create update object
-        logger.info("Creating Update object...")
-        update = Update.de_json(data, application.bot)
-        
-        if update is None:
-            logger.error("Failed to create Update object")
-            return {"ok": False, "error": "Failed to create Update object"}
+            # Only try to send message if we have the required data
+            if data.get('message', {}).get('chat', {}).get('id'):
+                chat_id = data['message']['chat']['id']
+                logger.info(f"Sending test message to chat_id: {chat_id}")
+                
+                try:
+                    await application.bot.send_message(
+                        chat_id=chat_id,
+                        text="Test message received! 🚀"
+                    )
+                    logger.info("Message sent successfully")
+                except Exception as msg_error:
+                    logger.error(f"Error sending message: {msg_error}")
+                    
+        except Exception as data_error:
+            logger.error(f"Error processing data: {data_error}")
             
-        logger.info(f"Created Update object: {update}")
-        
-        # Process update
-        logger.info("Processing update...")
-        await application.process_update(update)
-        logger.info("Update processed successfully")
-        
-        return {"ok": True, "message": "Update processed successfully"}
+        # Always return success to prevent retries
+        return response
         
     except Exception as e:
-        logger.error(f"Error in webhook handler: {str(e)}", exc_info=True)
-        # Always return 200 to prevent Telegram retries
+        logger.error(f"Critical webhook error: {e}")
+        # Still return 200 to prevent Telegram retries
         return {"ok": False, "error": str(e)}
 
 @app.on_event("startup")
