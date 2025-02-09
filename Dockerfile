@@ -15,13 +15,7 @@ COPY requirements.txt .
 # Installeer dependencies
 RUN pip install -r requirements.txt
 
-# Expose port
-EXPOSE 8080
-
-# Use environment variables
-ENV PORT=8080
-
-# Start command
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]
+# Start met shell om environment variables te kunnen gebruiken
+CMD uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8080}
 
 
