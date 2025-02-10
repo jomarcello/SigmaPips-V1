@@ -2,7 +2,7 @@ import os
 import logging
 from fastapi import FastAPI, Request, BackgroundTasks
 from telegram import Bot, Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import Application, CommandHandler, CallbackQueryHandler
+from telegram.ext import Application, CommandHandler, CallbackQueryHandler, MessageHandler, filters
 from app.bot.constants import MARKETS
 from app.utils.supabase import supabase
 
@@ -43,6 +43,7 @@ async def startup_event():
         application.add_handler(CommandHandler("help", help_command))
         application.add_handler(CommandHandler("status", status_command))
         application.add_handler(CallbackQueryHandler(button_callback))
+        application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo_message))
         logger.info("Added command handlers")
         
         # Start application
@@ -103,21 +104,18 @@ async def button_callback(update: Update, context):
     
     try:
         if query.data.startswith("market_"):
-            # Show instruments for selected market
             market_id = query.data.replace("market_", "")
-            market_data = MARKETS[market_id]
-            
-            keyboard = [
-                [InlineKeyboardButton(instrument, callback_data=f"instrument_{market_id}_{instrument}")]
-                for instrument in market_data["instruments"]
-            ]
-            keyboard.append([InlineKeyboardButton("🔙 Back to Markets", callback_data="back_to_markets")])
-            reply_markup = InlineKeyboardMarkup(keyboard)
-            
-            await query.message.edit_text(
-                f"Select a {market_data['name']} instrument:",
-                reply_markup=reply_markup
-            )
+            if market_id in MARKETS:
+                market = MARKETS[market_id]
+                keyboard = [
+                    [InlineKeyboardButton(instrument, callback_data=f"instrument_{market_id}_{instrument}")]
+                    for instrument in market["instruments"]
+                ]
+                reply_markup = InlineKeyboardMarkup(keyboard)
+                await query.message.edit_text(
+                    f"Select an instrument from {market['name']}:",
+                    reply_markup=reply_markup
+                )
         
         elif query.data.startswith("instrument_"):
             # Show timeframe selection
