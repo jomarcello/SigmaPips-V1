@@ -7,7 +7,6 @@ from typing import Dict, Any, List
 from openai import AsyncOpenAI
 import redis
 from supabase import create_client
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -69,19 +68,26 @@ class TradingBot:
         """Send Telegram message with inline buttons"""
         try:
             # Maak keyboard met inline knoppen
-            keyboard = [
-                [
-                    InlineKeyboardButton("📊 Technische Analyse", 
-                                       callback_data=f"chart_{signal['symbol']}_{signal['timeframe']}"),
-                    InlineKeyboardButton("🤖 Markt Sentiment", 
-                                       callback_data=f"sentiment_{signal['symbol']}")
-                ],
-                [
-                    InlineKeyboardButton("📅 Economische Kalender", 
-                                       callback_data=f"calendar_{signal['symbol']}")
+            keyboard = {
+                "inline_keyboard": [
+                    [
+                        {
+                            "text": "📊 Technische Analyse",
+                            "callback_data": f"chart_{signal.get('symbol', '')}_{signal.get('timeframe', '')}"
+                        },
+                        {
+                            "text": "🤖 Markt Sentiment",
+                            "callback_data": f"sentiment_{signal.get('symbol', '')}"
+                        }
+                    ],
+                    [
+                        {
+                            "text": "📅 Economische Kalender",
+                            "callback_data": f"calendar_{signal.get('symbol', '')}"
+                        }
+                    ]
                 ]
-            ]
-            reply_markup = InlineKeyboardMarkup(keyboard)
+            }
 
             # Stuur bericht met knoppen
             url = f"https://api.telegram.org/bot{self.telegram_token}/sendMessage"
@@ -90,7 +96,7 @@ class TradingBot:
                     "chat_id": chat_id,
                     "text": message,
                     "parse_mode": "Markdown",
-                    "reply_markup": reply_markup.to_dict()
+                    "reply_markup": keyboard
                 })
 
         except Exception as e:
