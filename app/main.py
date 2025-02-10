@@ -99,9 +99,11 @@ async def status_command(update: Update, context):
 async def button_callback(update: Update, context):
     """Handle button callbacks"""
     query = update.callback_query
-    await query.answer()
+    logger.debug(f"Received callback query: {query.data}")
     
     try:
+        await query.answer()
+        
         if query.data.startswith("market_"):
             market_id = query.data.replace("market_", "")
             if market_id in MARKETS:
@@ -110,6 +112,8 @@ async def button_callback(update: Update, context):
                     [InlineKeyboardButton(instrument, callback_data=f"instrument_{market_id}_{instrument}")]
                     for instrument in market["instruments"]
                 ]
+                # Add back button
+                keyboard.append([InlineKeyboardButton("🔙 Back to Markets", callback_data="back_to_markets")])
                 reply_markup = InlineKeyboardMarkup(keyboard)
                 await query.message.edit_text(
                     f"Select an instrument from {market['name']}:",
@@ -135,50 +139,57 @@ async def button_callback(update: Update, context):
         elif query.data.startswith("timeframe_"):
             # Process the complete selection
             _, market_id, instrument, timeframe = query.data.split("_", 3)
-            user_id = query.from_user.id
+            user_id = str(query.from_user.id)  # Convert to string for Supabase
             
             # Save to Supabase
             data = {
                 "user_id": user_id,
                 "market": market_id,
                 "instrument": instrument,
-                "timeframe": timeframe
+                "timeframe": timeframe,
+                "created_at": "now()"  # Add timestamp
             }
             
-            # Check for duplicates
-            response = supabase.table("signal_preferences").select("*").eq(
-                "user_id", user_id
-            ).eq("market", market_id).eq("instrument", instrument).eq(
-                "timeframe", timeframe
-            ).execute()
-            
-            if not response.data:  # No duplicate found
-                result = supabase.table("signal_preferences").insert(data).execute()
-                logger.info(f"Saved preference to Supabase: {data}")
+            try:
+                # Check for duplicates
+                response = supabase.table("signal_preferences").select("*").eq(
+                    "user_id", user_id
+                ).eq("market", market_id).eq("instrument", instrument).eq(
+                    "timeframe", timeframe
+                ).execute()
                 
-                keyboard = [
-                    [
-                        InlineKeyboardButton("➕ Add Another", callback_data="back_to_markets"),
-                        InlineKeyboardButton("📋 My Preferences", callback_data="view_preferences")
+                logger.debug(f"Supabase duplicate check response: {response}")
+                
+                if not response.data:  # No duplicate found
+                    result = supabase.table("signal_preferences").insert(data).execute()
+                    logger.info(f"Saved preference to Supabase: {result}")
+                    
+                    keyboard = [
+                        [
+                            InlineKeyboardButton("➕ Add Another", callback_data="back_to_markets"),
+                            InlineKeyboardButton("📋 My Preferences", callback_data="view_preferences")
+                        ]
                     ]
-                ]
-                reply_markup = InlineKeyboardMarkup(keyboard)
-                
-                await query.message.edit_text(
-                    f"✅ Preference saved!\n\n"
-                    f"Market: {MARKETS[market_id]['name']}\n"
-                    f"Instrument: {instrument}\n"
-                    f"Timeframe: {timeframe}",
-                    reply_markup=reply_markup
-                )
-            else:
-                await query.message.edit_text(
-                    "⚠️ This preference already exists!\n"
-                    "Please choose a different combination.",
-                    reply_markup=InlineKeyboardMarkup([[
-                        InlineKeyboardButton("🔙 Back to Markets", callback_data="back_to_markets")
-                    ]])
-                )
+                    reply_markup = InlineKeyboardMarkup(keyboard)
+                    
+                    await query.message.edit_text(
+                        f"✅ Preference saved!\n\n"
+                        f"Market: {MARKETS[market_id]['name']}\n"
+                        f"Instrument: {instrument}\n"
+                        f"Timeframe: {timeframe}",
+                        reply_markup=reply_markup
+                    )
+                else:
+                    keyboard = [[InlineKeyboardButton("🔙 Back to Markets", callback_data="back_to_markets")]]
+                    reply_markup = InlineKeyboardMarkup(keyboard)
+                    await query.message.edit_text(
+                        "⚠️ This preference already exists!\n"
+                        "Please choose a different combination.",
+                        reply_markup=reply_markup
+                    )
+            except Exception as e:
+                logger.error(f"Supabase error: {str(e)}", exc_info=True)
+                raise
         
         elif query.data == "back_to_markets":
             keyboard = [
