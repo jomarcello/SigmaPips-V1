@@ -1,8 +1,10 @@
 import os
 import logging
 from fastapi import FastAPI, Request, BackgroundTasks
-from telegram import Bot, Update
-from telegram.ext import Application, CommandHandler
+from telegram import Bot, Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import Application, CommandHandler, CallbackQueryHandler
+from app.bot.constants import MARKETS
+from app.utils.supabase import supabase
 
 # Set up logging
 logging.basicConfig(
@@ -38,6 +40,9 @@ async def startup_event():
         
         # Add handlers
         application.add_handler(CommandHandler("start", start_command))
+        application.add_handler(CommandHandler("help", help_command))
+        application.add_handler(CommandHandler("status", status_command))
+        application.add_handler(CallbackQueryHandler(button_callback))
         logger.info("Added command handlers")
         
         # Start application
@@ -62,7 +67,174 @@ async def shutdown_event():
 async def start_command(update: Update, context):
     """Handle /start command"""
     logger.info(f"Start command from user {update.effective_user.id}")
-    await update.message.reply_text("Bot is working! 🚀")
+    user = update.effective_user
+    
+    # Show market selection
+    keyboard = [
+        [InlineKeyboardButton(market_data["name"], callback_data=f"market_{market_id}")]
+        for market_id, market_data in MARKETS.items()
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    
+    await update.message.reply_text(
+        f"Welcome {user.first_name}! 👋\n\n"
+        "Please select a market to receive trading signals:",
+        reply_markup=reply_markup
+    )
+
+async def help_command(update: Update, context):
+    """Handle /help command"""
+    await update.message.reply_text(
+        "🤖 TradingBot Help:\n\n"
+        "Commands:\n"
+        "/start - Start the bot\n"
+        "/help - Show this help message\n"
+        "/status - Check bot status"
+    )
+
+async def status_command(update: Update, context):
+    """Handle /status command"""
+    await update.message.reply_text("✅ Bot is online and active!")
+
+async def button_callback(update: Update, context):
+    """Handle button callbacks"""
+    query = update.callback_query
+    await query.answer()
+    
+    try:
+        if query.data.startswith("market_"):
+            # Show instruments for selected market
+            market_id = query.data.replace("market_", "")
+            market_data = MARKETS[market_id]
+            
+            keyboard = [
+                [InlineKeyboardButton(instrument, callback_data=f"instrument_{market_id}_{instrument}")]
+                for instrument in market_data["instruments"]
+            ]
+            keyboard.append([InlineKeyboardButton("🔙 Back to Markets", callback_data="back_to_markets")])
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            
+            await query.message.edit_text(
+                f"Select a {market_data['name']} instrument:",
+                reply_markup=reply_markup
+            )
+        
+        elif query.data.startswith("instrument_"):
+            # Show timeframe selection
+            _, market_id, instrument = query.data.split("_", 2)
+            
+            keyboard = [
+                [InlineKeyboardButton(tf, callback_data=f"timeframe_{market_id}_{instrument}_{tf}")]
+                for tf in ["15m", "1h", "4h"]
+            ]
+            keyboard.append([InlineKeyboardButton("🔙 Back to Instruments", callback_data=f"market_{market_id}")])
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            
+            await query.message.edit_text(
+                f"Select a timeframe for {instrument}:",
+                reply_markup=reply_markup
+            )
+        
+        elif query.data.startswith("timeframe_"):
+            # Process the complete selection
+            _, market_id, instrument, timeframe = query.data.split("_", 3)
+            user_id = query.from_user.id
+            
+            # Save to Supabase
+            data = {
+                "user_id": user_id,
+                "market": market_id,
+                "instrument": instrument,
+                "timeframe": timeframe
+            }
+            
+            # Check for duplicates
+            response = supabase.table("signal_preferences").select("*").eq(
+                "user_id", user_id
+            ).eq("market", market_id).eq("instrument", instrument).eq(
+                "timeframe", timeframe
+            ).execute()
+            
+            if not response.data:  # No duplicate found
+                result = supabase.table("signal_preferences").insert(data).execute()
+                logger.info(f"Saved preference to Supabase: {data}")
+                
+                keyboard = [
+                    [
+                        InlineKeyboardButton("➕ Add Another", callback_data="back_to_markets"),
+                        InlineKeyboardButton("📋 My Preferences", callback_data="view_preferences")
+                    ]
+                ]
+                reply_markup = InlineKeyboardMarkup(keyboard)
+                
+                await query.message.edit_text(
+                    f"✅ Preference saved!\n\n"
+                    f"Market: {MARKETS[market_id]['name']}\n"
+                    f"Instrument: {instrument}\n"
+                    f"Timeframe: {timeframe}",
+                    reply_markup=reply_markup
+                )
+            else:
+                await query.message.edit_text(
+                    "⚠️ This preference already exists!\n"
+                    "Please choose a different combination.",
+                    reply_markup=InlineKeyboardMarkup([[
+                        InlineKeyboardButton("🔙 Back to Markets", callback_data="back_to_markets")
+                    ]])
+                )
+        
+        elif query.data == "back_to_markets":
+            keyboard = [
+                [InlineKeyboardButton(market_data["name"], callback_data=f"market_{market_id}")]
+                for market_id, market_data in MARKETS.items()
+            ]
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            
+            await query.message.edit_text(
+                "Please select a market to receive trading signals:",
+                reply_markup=reply_markup
+            )
+            
+        elif query.data == "view_preferences":
+            # Show user preferences
+            response = supabase.table("signal_preferences").select("*").eq(
+                "user_id", query.from_user.id
+            ).execute()
+            
+            if response.data:
+                text = "📋 Your signal preferences:\n\n"
+                for i, pref in enumerate(response.data, 1):
+                    text += f"{i}. {pref['market'].upper()} - {pref['instrument']} ({pref['timeframe']})\n"
+                
+                keyboard = []
+                for i, pref in enumerate(response.data, 1):
+                    keyboard.append([
+                        InlineKeyboardButton(
+                            f"🗑️ Delete #{i}", 
+                            callback_data=f"delete_preference_{pref['id']}"
+                        )
+                    ])
+                
+                keyboard.append([InlineKeyboardButton("➕ Add More", callback_data="back_to_markets")])
+                reply_markup = InlineKeyboardMarkup(keyboard)
+                
+                await query.message.edit_text(text, reply_markup=reply_markup)
+            else:
+                await query.message.edit_text(
+                    "You don't have any signal preferences yet.",
+                    reply_markup=InlineKeyboardMarkup([[
+                        InlineKeyboardButton("➕ Add Preferences", callback_data="back_to_markets")
+                    ]])
+                )
+                
+    except Exception as e:
+        logger.error(f"Error in button callback: {str(e)}", exc_info=True)
+        await query.message.edit_text(
+            "❌ An error occurred. Please try again.",
+            reply_markup=InlineKeyboardMarkup([[
+                InlineKeyboardButton("🔙 Back to Markets", callback_data="back_to_markets")
+            ]])
+        )
 
 @app.get("/")
 async def root():
