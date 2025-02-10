@@ -6,15 +6,15 @@ MARKETS = {
     },
     "crypto": {
         "name": "Crypto",
-        "instruments": ["BTCUSD", "ETHUSD", "XRPUSD", "ADAUSD", "SOLUSD"]
+        "instruments": ["BTCUSDT", "ETHUSDT", "BNBUSDT"]
     },
     "commodities": {
         "name": "Commodities",
-        "instruments": ["XAUUSD", "XAGUSD", "WTIUSD", "XCUUSD", "NATGAS"]
+        "instruments": ["XAUUSD", "XAGUSD", "WTIUSD"]
     },
     "indices": {
         "name": "Indices",
-        "instruments": ["SPX500", "NAS100", "US30", "GER40", "UK100"]
+        "instruments": ["US30", "SPX500", "NASDAQ"]
     }
 }
 

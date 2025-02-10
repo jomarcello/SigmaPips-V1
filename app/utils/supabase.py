@@ -7,18 +7,18 @@ from app.utils.logger import logger
 load_dotenv()
 
 # Get Supabase credentials
-url = os.getenv("SUPABASE_URL")
-key = os.getenv("SUPABASE_KEY")
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
 # Debug logging
-logger.debug(f"Initializing Supabase with URL: {url}")
-if not url or not key:
-    raise ValueError("Missing Supabase credentials in .env file")
+logger.debug(f"Initializing Supabase with URL: {SUPABASE_URL}")
+if not SUPABASE_URL or not SUPABASE_KEY:
+    raise ValueError("Missing Supabase credentials")
 
 # Initialize Supabase client
 try:
     # Basic initialization without extra options
-    supabase = create_client(url, key)
+    supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
     logger.info("Supabase client initialized successfully")
 except Exception as e:
     logger.error(f"Failed to initialize Supabase client: {str(e)}", exc_info=True)
