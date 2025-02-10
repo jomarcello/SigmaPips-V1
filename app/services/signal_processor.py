@@ -1,83 +1,77 @@
 import logging
 from typing import Dict, Any
-from app.services.technical_analysis import analyze_technical
-from app.services.news_sentiment import analyze_sentiment
-from app.services.chart_analysis import generate_chart_analysis
 from app.utils.supabase import supabase
-from telegram import Bot
-import os
-
-# Initialize bot
-bot = Bot(os.getenv("TELEGRAM_BOT_TOKEN"))
+from app.services.telegram_service import TelegramService
+from app.services.news_service import NewsAIService
+from app.services.chart_service import ChartService
+from app.services.calendar_service import CalendarService
 
 logger = logging.getLogger(__name__)
 
-async def process_signal(signal_data: Dict[str, Any]) -> Dict[str, Any]:
-    """Process incoming signal through all analysis services"""
-    try:
-        # Run all analyses in parallel
-        technical = await analyze_technical(signal_data)
-        sentiment = await analyze_sentiment(signal_data["instrument"])
-        chart = await generate_chart_analysis(signal_data)
-        
-        # Combine all analyses
-        complete_signal = {
-            **signal_data,
-            "technical_analysis": technical,
-            "sentiment_analysis": sentiment,
-            "chart_analysis": chart
-        }
-        
-        logger.info(f"Signal processed successfully: {complete_signal}")
-        return complete_signal
-        
-    except Exception as e:
-        logger.error(f"Signal processing error: {str(e)}")
-        raise
+class SignalProcessor:
+    def __init__(self):
+        self.telegram_service = TelegramService(supabase)
+        self.news_service = NewsAIService(supabase)
+        self.chart_service = ChartService()
+        self.calendar_service = CalendarService(supabase)
 
-async def distribute_signal(signal: Dict[str, Any]) -> Dict[str, Any]:
-    """Distribute signal to subscribers"""
-    try:
-        logger.info(f"Distributing signal: {signal}")
-        
-        # Get subscribers from database
-        response = supabase.table("signal_preferences").select("*").eq(
-            "market", signal["market"]
-        ).eq("instrument", signal["instrument"]).eq(
-            "timeframe", signal["timeframe"]
-        ).execute()
-        
-        # Send to each subscriber
-        sent_count = 0
-        for pref in response.data:
-            message = (
-                f"🚨 SIGMAPIPS AI SIGNAL ALERT! 🚨\n\n"
-                f"📊 {signal['instrument']} ({signal['timeframe']})\n"
-                f"📈 Action: {signal['action']}\n"
-                f"💰 Price: {signal['price']}\n\n"
-                f"Technical Analysis:\n"
-                f"• Trend: {signal['technical_analysis']['trend']}\n"
-                f"• RSI: {signal['technical_analysis']['indicators']['rsi']}\n"
-                f"• MACD: {signal['technical_analysis']['indicators']['macd']}\n\n"
-                f"Sentiment: {signal['sentiment_analysis']['sentiment']}\n"
-                f"Score: {signal['sentiment_analysis']['score']}\n\n"
-                f"Chart Patterns: {', '.join(signal['chart_analysis']['patterns'])}\n"
-                f"Support: {', '.join(signal['chart_analysis']['key_levels']['support'])}\n"
-                f"Resistance: {', '.join(signal['chart_analysis']['key_levels']['resistance'])}"
+    async def process_signal(self, signal_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Process incoming signal through all services"""
+        try:
+            # Get analyses from all services
+            sentiment = await self.news_service.analyze_sentiment(signal_data["instrument"])
+            chart = await self.chart_service.generate_chart(
+                signal_data["instrument"], 
+                signal_data["timeframe"]
             )
-            
-            await bot.send_message(
-                chat_id=int(pref["user_id"]),
-                text=message
-            )
-            sent_count += 1
-            
-        return {
-            "status": "distributed",
-            "sent_to": sent_count,
-            "signal": signal
-        }
-        
-    except Exception as e:
-        logger.error(f"Signal distribution error: {str(e)}")
-        raise
+            events = await self.calendar_service.get_relevant_events(signal_data["instrument"])
+
+            # Combine all analyses
+            complete_signal = {
+                **signal_data,
+                "sentiment_analysis": sentiment,
+                "chart": chart,
+                "calendar_events": events
+            }
+
+            logger.info(f"Signal processed successfully: {complete_signal}")
+            return complete_signal
+
+        except Exception as e:
+            logger.error(f"Signal processing error: {str(e)}")
+            raise
+
+    async def distribute_signal(self, signal: Dict[str, Any]) -> Dict[str, Any]:
+        """Distribute signal to subscribers"""
+        try:
+            # Get subscribers
+            response = supabase.table("signal_preferences").select("*").eq(
+                "market", signal["market"]
+            ).eq("instrument", signal["instrument"]).eq(
+                "timeframe", signal["timeframe"]
+            ).execute()
+
+            # Send to each subscriber
+            sent_count = 0
+            for pref in response.data:
+                await self.telegram_service.send_signal(
+                    chat_id=pref["user_id"],
+                    signal=signal,
+                    sentiment=signal["sentiment_analysis"],
+                    chart=signal["chart"],
+                    events=signal["calendar_events"]
+                )
+                sent_count += 1
+
+            return {
+                "status": "distributed",
+                "sent_to": sent_count,
+                "signal": signal
+            }
+
+        except Exception as e:
+            logger.error(f"Signal distribution error: {str(e)}")
+            raise
+
+# Create singleton instance
+processor = SignalProcessor()
