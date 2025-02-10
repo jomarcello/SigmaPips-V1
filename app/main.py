@@ -5,6 +5,7 @@ from telegram import Bot, Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, MessageHandler, filters
 from app.bot.constants import MARKETS
 from app.utils.supabase import supabase
+from app.services.signal_processor import process_signal
 
 # Set up logging
 logging.basicConfig(
@@ -292,58 +293,122 @@ async def echo_message(update: Update, context):
 
 @app.post("/send_test_signal")
 async def send_test_signal():
-    """Send a test signal to subscribers"""
+    """Trigger the signal processor with a test signal"""
     try:
-        # Haal alle preferences op uit Supabase
-        response = supabase.table("signal_preferences").select("*").execute()
-        logger.info(f"Found {len(response.data)} preferences")
-        
-        if not response.data:
-            return {"message": "No subscribers found"}
-            
-        # Test signaal
+        # Basic signal data
         signal = {
             "market": "forex",
             "instrument": "EURUSD",
             "timeframe": "15m",
-            "direction": "BUY",
-            "entry": "1.0750",
-            "sl": "1.0720",
-            "tp": "1.0800",
-            "reason": "Test signal - Price broke above resistance"
+            "price": "1.0750",
+            "type": "breakout",
+            "direction": "BUY"
         }
         
-        # Stuur naar alle subscribers die dit instrument volgen
+        # Process signal through all services
+        complete_signal = await process_signal(signal)
+        logger.info("Signal processed successfully")
+        
+        # Get subscribers for this instrument
+        response = supabase.table("signal_preferences").select("*").eq(
+            "market", signal["market"]
+        ).eq("instrument", signal["instrument"]).eq(
+            "timeframe", signal["timeframe"]
+        ).execute()
+        
+        # Send to subscribers
         sent_count = 0
         for pref in response.data:
-            if (pref["market"] == signal["market"] and 
-                pref["instrument"] == signal["instrument"] and 
-                pref["timeframe"] == signal["timeframe"]):
-                
-                message = (
-                    f"🚨 NEW SIGNAL ALERT!\n\n"
-                    f"📊 {signal['instrument']} ({signal['timeframe']})\n"
-                    f"📈 Action: {signal['direction']}\n"
-                    f"⚡️ Entry: {signal['entry']}\n"
-                    f"🛑 Stop Loss: {signal['sl']}\n"
-                    f"🎯 Take Profit: {signal['tp']}\n\n"
-                    f"📝 Analysis:\n{signal['reason']}"
-                )
-                
-                await bot.send_message(
-                    chat_id=int(pref["user_id"]),  # Convert string to int
-                    text=message
-                )
-                sent_count += 1
-                logger.info(f"Signal sent to user {pref['user_id']}")
-                
+            message = (
+                f"🚨 SIGMAPIPS AI SIGNAL ALERT! 🚨\n\n"
+                f"📊 Instrument: {complete_signal['instrument']}\n"
+                f"⏱ Timeframe: {complete_signal['timeframe']}\n"
+                f"📈 Action: {complete_signal['direction']}\n\n"
+                f"🎯 Entry Zone: {complete_signal['price']}\n"
+                f"🛑 Stop Loss: 1.0720\n"
+                f"✨ Take Profit: 1.0800\n\n"
+                f"📊 Technical Analysis:\n"
+                f"➤ Trend: {complete_signal['technical_analysis']['trend']}\n"
+                f"➤ Strength: {complete_signal['technical_analysis']['strength']}\n"
+                f"➤ Indicators:\n"
+                f"• RSI: {complete_signal['technical_analysis']['indicators']['rsi']}\n"
+                f"• MACD: {complete_signal['technical_analysis']['indicators']['macd']}\n"
+                f"• EMA: {complete_signal['technical_analysis']['indicators']['ema']}\n\n"
+                f"🤖 AI Sentiment Analysis:\n"
+                f"• Score: {complete_signal['sentiment_analysis']['score']}\n"
+                f"• Sentiment: {complete_signal['sentiment_analysis']['sentiment']}\n"
+                f"• Confidence: {complete_signal['sentiment_analysis']['confidence']}\n"
+                f"📰 Recent News:\n"
+                f"- {complete_signal['sentiment_analysis']['recent_news'][0]}\n"
+                f"- {complete_signal['sentiment_analysis']['recent_news'][1]}\n\n"
+                f"📊 Chart Analysis:\n"
+                f"• Patterns: {', '.join(complete_signal['chart_analysis']['patterns'])}\n"
+                f"• Key Levels:\n"
+                f"  Support: {', '.join(complete_signal['chart_analysis']['key_levels']['support'])}\n"
+                f"  Resistance: {', '.join(complete_signal['chart_analysis']['key_levels']['resistance'])}\n\n"
+                f"⚠️ Risk Management:\n"
+                f"• Always use proper position sizing\n"
+                f"• Never risk more than 1-2% per trade\n"
+                f"• Multiple take profit levels recommended\n\n"
+                f"🤖 Generated by SigmaPips AI"
+            )
+            
+            await bot.send_message(
+                chat_id=int(pref["user_id"]),
+                text=message
+            )
+            sent_count += 1
+            logger.info(f"Signal sent to user {pref['user_id']}")
+        
         return {
-            "message": f"Test signal sent to {sent_count} subscribers",
-            "signal": signal
+            "status": "success",
+            "sent_to": sent_count,
+            "signal": complete_signal
         }
         
     except Exception as e:
-        logger.error(f"Error sending test signal: {str(e)}", exc_info=True)
+        logger.error(f"Error processing signal: {str(e)}", exc_info=True)
+        return {"error": str(e)}
+
+@app.post("/signal")
+async def receive_tradingview_signal():
+    """Receive signal from TradingView and process through all services"""
+    try:
+        # Simuleer TradingView signaal
+        tradingview_signal = {
+            "market": "forex",
+            "instrument": "EURUSD",
+            "timeframe": "15m",
+            "action": "BUY",
+            "price": 1.0750,
+            "strategy": {
+                "name": "SigmaPips Strategy",
+                "version": "1.0",
+                "timeframe": "15m"
+            },
+            "indicators": {
+                "rsi": 65,
+                "macd": "bullish",
+                "ema": "above"
+            }
+        }
+        
+        logger.info(f"Received TradingView signal: {tradingview_signal}")
+        
+        # Process via services
+        complete_signal = await process_signal(tradingview_signal)
+        
+        # Distribute to subscribers
+        response = await distribute_signal(complete_signal)
+        
+        return {
+            "status": "success",
+            "message": "Signal processed and distributed",
+            "details": response
+        }
+        
+    except Exception as e:
+        logger.error(f"Error processing TradingView signal: {str(e)}", exc_info=True)
         return {"error": str(e)}
 
 if __name__ == "__main__":
