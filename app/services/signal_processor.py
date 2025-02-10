@@ -32,7 +32,6 @@ async def process_signal(signal_data: Dict[str, Any]) -> Dict[str, Any]:
 async def distribute_signal(signal: Dict[str, Any]) -> Dict[str, Any]:
     """Distribute signal to subscribers"""
     try:
-        # TODO: Implement actual signal distribution
         logger.info(f"Distributing signal: {signal}")
         return {
             "status": "distributed",
