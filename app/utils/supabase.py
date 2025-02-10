@@ -17,14 +17,9 @@ if not url or not key:
 
 # Initialize Supabase client
 try:
-    # Simplified initialization
-    supabase: Client = create_client(
-        supabase_url=url,
-        supabase_key=key
-    )
-    # Test connection
-    response = supabase.table('signal_preferences').select("count").execute()
-    logger.info("Supabase client initialized and connected successfully")
+    # Basic initialization without extra options
+    supabase = create_client(url, key)
+    logger.info("Supabase client initialized successfully")
 except Exception as e:
     logger.error(f"Failed to initialize Supabase client: {str(e)}", exc_info=True)
     raise 
