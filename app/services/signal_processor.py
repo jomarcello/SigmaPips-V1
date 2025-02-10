@@ -39,4 +39,4 @@ async def distribute_signal(signal: Dict[str, Any]) -> Dict[str, Any]:
         }
     except Exception as e:
         logger.error(f"Signal distribution error: {str(e)}")
-        raise 
+        raise
