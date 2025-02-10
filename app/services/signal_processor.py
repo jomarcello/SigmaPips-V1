@@ -1,10 +1,10 @@
 import logging
 from typing import Dict, Any
 from app.utils.supabase import supabase
-from app.services.telegram_service import TelegramService
-from app.services.news_service import NewsAIService
-from app.services.chart_service import ChartService
-from app.services.calendar_service import CalendarService
+from app.services.telegram.service import TelegramService
+from app.services.sentiment.service import NewsAIService
+from app.services.chart.service import ChartService
+from app.services.calendar.service import CalendarService
 
 logger = logging.getLogger(__name__)
 
