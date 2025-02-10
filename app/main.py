@@ -5,7 +5,7 @@ from telegram import Bot, Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, MessageHandler, filters
 from app.bot.constants import MARKETS
 from app.utils.supabase import supabase
-import app.services.signal_processor as signal_processor
+from app.services.signal_processor import processor
 
 # Set up logging
 logging.basicConfig(
@@ -306,7 +306,7 @@ async def send_test_signal():
         }
         
         # Process signal through all services
-        complete_signal = await signal_processor.process_signal(signal)
+        complete_signal = await processor.process_signal(signal)
         logger.info("Signal processed successfully")
         
         # Get subscribers for this instrument
@@ -396,10 +396,10 @@ async def receive_tradingview_signal():
         logger.info(f"Received TradingView signal: {tradingview_signal}")
         
         # Process via services
-        complete_signal = await signal_processor.process_signal(tradingview_signal)
+        complete_signal = await processor.process_signal(tradingview_signal)
         
         # Distribute to subscribers
-        response = await signal_processor.distribute_signal(complete_signal)
+        response = await processor.distribute_signal(complete_signal)
         
         return {
             "status": "success",
