@@ -1,15 +1,20 @@
 import logging
 from typing import Dict, Any
 from app.utils.supabase import supabase
-from app.services.telegram.service import TelegramService
-from app.services.sentiment.service import NewsAIService
-from app.services.chart.service import ChartService
-from app.services.calendar.service import CalendarService
+
+# Dynamische imports om circulaire dependencies te voorkomen
+def get_services():
+    from app.services.telegram.telegram_service import TelegramService
+    from app.services.sentiment.news_ai_service import NewsAIService
+    from app.services.chart.chart_service import ChartService
+    from app.services.calendar.calendar_service import CalendarService
+    return TelegramService, NewsAIService, ChartService, CalendarService
 
 logger = logging.getLogger(__name__)
 
 class SignalProcessor:
     def __init__(self):
+        TelegramService, NewsAIService, ChartService, CalendarService = get_services()
         self.telegram_service = TelegramService(supabase)
         self.news_service = NewsAIService(supabase)
         self.chart_service = ChartService()
