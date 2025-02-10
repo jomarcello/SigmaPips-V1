@@ -29,10 +29,11 @@ async def startup_event():
             
         logger.info("Initializing bot...")
         bot = Bot(TOKEN)
-        application = Application.builder().token(TOKEN).build()
+        await bot.initialize()  # Initialize bot first
         
         # Initialize application
         logger.info("Initializing application...")
+        application = Application.builder().token(TOKEN).build()
         await application.initialize()
         
         # Add handlers
