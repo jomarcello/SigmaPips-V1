@@ -290,6 +290,62 @@ async def echo_message(update: Update, context):
     """Echo the user message."""
     await update.message.reply_text(update.message.text)
 
+@app.post("/send_test_signal")
+async def send_test_signal():
+    """Send a test signal to subscribers"""
+    try:
+        # Haal alle preferences op uit Supabase
+        response = supabase.table("signal_preferences").select("*").execute()
+        logger.info(f"Found {len(response.data)} preferences")
+        
+        if not response.data:
+            return {"message": "No subscribers found"}
+            
+        # Test signaal
+        signal = {
+            "market": "forex",
+            "instrument": "EURUSD",
+            "timeframe": "15m",
+            "direction": "BUY",
+            "entry": "1.0750",
+            "sl": "1.0720",
+            "tp": "1.0800",
+            "reason": "Test signal - Price broke above resistance"
+        }
+        
+        # Stuur naar alle subscribers die dit instrument volgen
+        sent_count = 0
+        for pref in response.data:
+            if (pref["market"] == signal["market"] and 
+                pref["instrument"] == signal["instrument"] and 
+                pref["timeframe"] == signal["timeframe"]):
+                
+                message = (
+                    f"🚨 NEW SIGNAL ALERT!\n\n"
+                    f"📊 {signal['instrument']} ({signal['timeframe']})\n"
+                    f"📈 Action: {signal['direction']}\n"
+                    f"⚡️ Entry: {signal['entry']}\n"
+                    f"🛑 Stop Loss: {signal['sl']}\n"
+                    f"🎯 Take Profit: {signal['tp']}\n\n"
+                    f"📝 Analysis:\n{signal['reason']}"
+                )
+                
+                await bot.send_message(
+                    chat_id=int(pref["user_id"]),  # Convert string to int
+                    text=message
+                )
+                sent_count += 1
+                logger.info(f"Signal sent to user {pref['user_id']}")
+                
+        return {
+            "message": f"Test signal sent to {sent_count} subscribers",
+            "signal": signal
+        }
+        
+    except Exception as e:
+        logger.error(f"Error sending test signal: {str(e)}", exc_info=True)
+        return {"error": str(e)}
+
 if __name__ == "__main__":
     import uvicorn
     port = int(os.getenv("PORT", 8080))
