@@ -300,7 +300,8 @@ async def send_test_signal():
             "market": "forex",
             "instrument": "EURUSD",
             "timeframe": "15m",
-            "price": "1.0750",
+            "action": "BUY",
+            "price": 1.0750,
             "type": "breakout",
             "direction": "BUY"
         }
@@ -323,29 +324,13 @@ async def send_test_signal():
                 f"🚨 SIGMAPIPS AI SIGNAL ALERT! 🚨\n\n"
                 f"📊 Instrument: {complete_signal['instrument']}\n"
                 f"⏱ Timeframe: {complete_signal['timeframe']}\n"
-                f"📈 Action: {complete_signal['direction']}\n\n"
-                f"🎯 Entry Zone: {complete_signal['price']}\n"
-                f"🛑 Stop Loss: 1.0720\n"
-                f"✨ Take Profit: 1.0800\n\n"
-                f"📊 Technical Analysis:\n"
-                f"➤ Trend: {complete_signal['technical_analysis']['trend']}\n"
-                f"➤ Strength: {complete_signal['technical_analysis']['strength']}\n"
-                f"➤ Indicators:\n"
-                f"• RSI: {complete_signal['technical_analysis']['indicators']['rsi']}\n"
-                f"• MACD: {complete_signal['technical_analysis']['indicators']['macd']}\n"
-                f"• EMA: {complete_signal['technical_analysis']['indicators']['ema']}\n\n"
+                f"📈 Action: {complete_signal['action']}\n"
+                f"🎯 Entry Price: {complete_signal['price']}\n\n"
                 f"🤖 AI Sentiment Analysis:\n"
-                f"• Score: {complete_signal['sentiment_analysis']['score']}\n"
-                f"• Sentiment: {complete_signal['sentiment_analysis']['sentiment']}\n"
-                f"• Confidence: {complete_signal['sentiment_analysis']['confidence']}\n"
-                f"📰 Recent News:\n"
-                f"- {complete_signal['sentiment_analysis']['recent_news'][0]}\n"
-                f"- {complete_signal['sentiment_analysis']['recent_news'][1]}\n\n"
-                f"📊 Chart Analysis:\n"
-                f"• Patterns: {', '.join(complete_signal['chart_analysis']['patterns'])}\n"
-                f"• Key Levels:\n"
-                f"  Support: {', '.join(complete_signal['chart_analysis']['key_levels']['support'])}\n"
-                f"  Resistance: {', '.join(complete_signal['chart_analysis']['key_levels']['resistance'])}\n\n"
+                f"{complete_signal['sentiment_analysis']}\n\n"
+                f"📅 Economic Events:\n"
+                + "\n".join([f"• {event}" for event in complete_signal['calendar_events']])
+                + "\n\n"
                 f"⚠️ Risk Management:\n"
                 f"• Always use proper position sizing\n"
                 f"• Never risk more than 1-2% per trade\n"
