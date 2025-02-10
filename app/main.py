@@ -43,7 +43,6 @@ async def startup_event():
         application.add_handler(CommandHandler("help", help_command))
         application.add_handler(CommandHandler("status", status_command))
         application.add_handler(CallbackQueryHandler(button_callback))
-        application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo_message))
         logger.info("Added command handlers")
         
         # Start application
@@ -275,6 +274,10 @@ async def webhook(request: Request):
     except Exception as e:
         logger.error(f"Webhook error: {e}", exc_info=True)
         return {"ok": False, "error": str(e)}
+
+async def echo_message(update: Update, context):
+    """Echo the user message."""
+    await update.message.reply_text(update.message.text)
 
 if __name__ == "__main__":
     import uvicorn
