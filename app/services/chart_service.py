@@ -11,16 +11,7 @@ logger = logging.getLogger(__name__)
 
 class ChartService:
     def __init__(self):
-        self.chrome_options = self._setup_chrome_options()
-        
-    def _setup_chrome_options(self):
-        chrome_options = Options()
-        chrome_options.binary_location = os.getenv('CHROME_BIN', '/usr/bin/chromium')
-        chrome_options.add_argument('--headless')
-        chrome_options.add_argument('--no-sandbox')
-        chrome_options.add_argument('--disable-dev-shm-usage')
-        chrome_options.add_argument('--window-size=1920,1080')
-        return chrome_options
+        pass
         
     async def generate_chart(self, symbol: str, interval: str) -> Optional[bytes]:
         """Generate chart screenshot for symbol"""
@@ -34,7 +25,7 @@ class ChartService:
             logger.info("Setting up Chrome options...")
             chrome_options = Options()
             chrome_options.binary_location = os.getenv('CHROME_BIN', '/usr/bin/chromium')
-            chrome_options.add_argument('--headless=new')  # Nieuwe headless mode
+            chrome_options.add_argument('--headless=new')
             chrome_options.add_argument('--no-sandbox')
             chrome_options.add_argument('--disable-dev-shm-usage')
             chrome_options.add_argument('--disable-gpu')
