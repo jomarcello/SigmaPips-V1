@@ -18,13 +18,13 @@ class ChartService:
         try:
             logger.info(f"Starting chart generation for {symbol} ({interval})")
             
-            # Convert interval to lowercase
-            interval = interval.lower()
-            logger.info(f"Using lowercase interval: {interval}")
+            # Convert interval to lowercase and map to TradingView format
+            interval = self._convert_interval(interval.lower())
+            logger.info(f"Using TradingView interval: {interval}")
             
-            # Add FXCM broker to symbol
-            symbol = f"{symbol}:FXCM"
-            logger.info(f"Using symbol with broker: {symbol}")
+            # Add FX prefix to symbol
+            symbol = f"FX:{symbol}"  # FX:EURUSD format
+            logger.info(f"Using symbol with prefix: {symbol}")
             
             # Debug: Print environment variables
             logger.info(f"CHROME_BIN: {os.getenv('CHROME_BIN')}")
