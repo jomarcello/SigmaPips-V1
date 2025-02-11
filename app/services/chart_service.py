@@ -4,17 +4,19 @@ from typing import Optional
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
-import time
-import io
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from webdriver_manager.chrome import ChromeDriverManager
+import time
+import io
 
 logger = logging.getLogger(__name__)
 
 class ChartService:
     def __init__(self):
-        pass
+        self.driver_path = ChromeDriverManager().install()
+        logger.info(f"ChromeDriver installed at: {self.driver_path}")
         
     async def generate_chart(self, symbol: str, interval: str) -> Optional[bytes]:
         """Generate chart screenshot for symbol"""
@@ -44,7 +46,7 @@ class ChartService:
             
             logger.info("Initializing Chrome with options...")
             try:
-                service = Service(executable_path=os.getenv('CHROMEDRIVER_PATH', '/usr/bin/chromedriver'))
+                service = Service(executable_path=self.driver_path)
                 driver = webdriver.Chrome(service=service, options=chrome_options)
                 logger.info("Chrome driver initialized successfully")
                 
