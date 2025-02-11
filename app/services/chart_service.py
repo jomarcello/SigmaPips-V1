@@ -6,6 +6,9 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 import time
 import io
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 logger = logging.getLogger(__name__)
 
@@ -46,28 +49,32 @@ class ChartService:
                 logger.info("Chrome driver initialized successfully")
                 
                 try:
-                    # TradingView URL met correcte parameters
-                    url = f"https://www.tradingview.com/chart/?symbol={symbol}&interval={interval}"
+                    # TradingView URL met fullscreen parameter
+                    url = f"https://www.tradingview.com/chart/?symbol={symbol}&interval={interval}&fullscreen"
                     logger.info(f"Opening URL: {url}")
                     
                     # Get page
                     driver.get(url)
                     logger.info("Waiting for chart to load...")
-                    time.sleep(5)  # Wait for chart to load
                     
-                    # Hide sidebar and maximize chart
-                    logger.info("Maximizing chart view...")
+                    # Wacht tot de chart container geladen is
+                    WebDriverWait(driver, 10).until(
+                        EC.presence_of_element_located((By.CSS_SELECTOR, 'div[class*="chart-container"]'))
+                    )
+                    
+                    # Hide UI elements
+                    logger.info("Hiding UI elements...")
                     driver.execute_script("""
-                        // Hide left sidebar
-                        document.querySelector('[data-name="left-toolbar"]').style.display = 'none';
-                        // Hide right toolbar
-                        document.querySelector('[data-name="right-toolbar"]').style.display = 'none';
-                        // Hide header
-                        document.querySelector('header').style.display = 'none';
-                        // Maximize chart
-                        document.documentElement.requestFullscreen();
+                        document.querySelectorAll('div[class*="header"]').forEach(e => e.style.display = 'none');
+                        document.querySelectorAll('div[class*="pane-legend"]').forEach(e => e.style.display = 'none');
+                        document.querySelectorAll('div[class*="layout__area--left"]').forEach(e => e.style.display = 'none');
+                        document.querySelectorAll('div[class*="layout__area--right"]').forEach(e => e.style.display = 'none');
+                        document.querySelectorAll('div[class*="popup"]').forEach(e => e.style.display = 'none');
+                        document.querySelectorAll('div[class*="button"]').forEach(e => e.style.display = 'none');
                     """)
-                    time.sleep(1)  # Wait for UI changes
+                    
+                    # Extra wachttijd voor UI updates
+                    time.sleep(2)
                     
                     # Take screenshot
                     logger.info("Taking screenshot...")
