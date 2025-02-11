@@ -5,6 +5,7 @@ httpx~=0.24.0  # Specifieke versie voor python-telegram-bot
 uvicorn==0.27.0
 python-dotenv==1.0.0
 aiohttp==3.9.3  # Toegevoegd voor telegram service
+openai==1.10.0  # Toegevoegd voor news AI service
 
 # Database
 supabase==1.2.0
