@@ -6,7 +6,7 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y \
     build-essential \
     chromium \
-    libglvnd \
+    chromium-driver \
     && rm -rf /var/lib/apt/lists/*
 
 # Python dependencies
@@ -22,5 +22,5 @@ RUN mkdir -p logs
 # Environment variabele voor de port
 ENV PORT=8080
 
-# Start de main applicatie (niet de test service)
+# Start de main applicatie
 CMD ["python", "-m", "uvicorn", "trading_bot.main:app", "--host", "0.0.0.0", "--port", "${PORT}"]
