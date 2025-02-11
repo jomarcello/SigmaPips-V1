@@ -5,6 +5,7 @@ import os
 from openai import AsyncOpenAI
 import redis
 from supabase import create_client
+from app.services.chart_service import ChartService
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -19,6 +20,7 @@ class TradingBot:
     def __init__(self):
         self.token = os.getenv("TELEGRAM_BOT_TOKEN")
         self.bot = Bot(self.token)
+        self.chart_service = ChartService()
         
     async def match_subscribers(self, signal: Dict) -> List[str]:
         """Match signal with subscribers"""
@@ -130,5 +132,30 @@ class TradingBot:
         except Exception as e:
             logger.error(f"Error processing signal: {str(e)}")
             raise
+
+    async def handle_button_click(self, callback_query: Dict):
+        """Handle button clicks"""
+        try:
+            data = callback_query["data"]
+            chat_id = callback_query["message"]["chat"]["id"]
+
+            if data.startswith("chart_"):
+                _, symbol, timeframe = data.split("_")
+                # Generate and send chart
+                chart_bytes = await self.chart_service.generate_chart(symbol, timeframe)
+                if chart_bytes:
+                    await self.bot.send_photo(
+                        chat_id=chat_id,
+                        photo=chart_bytes,
+                        caption=f"📊 Technical Analysis for {symbol} ({timeframe})"
+                    )
+                else:
+                    await self.bot.send_message(
+                        chat_id=chat_id,
+                        text="❌ Sorry, could not generate chart at this time."
+                    )
+
+        except Exception as e:
+            logger.error(f"Error handling button click: {str(e)}")
 
 bot = TradingBot() 
