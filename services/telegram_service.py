@@ -82,17 +82,13 @@ I will help you set up your trading preferences.
 Please answer a few questions to get started.
 """
         
-        # Keyboard voor markten
+        # Keyboard voor markten (verticaal, zonder emoji's)
         keyboard = {
             "inline_keyboard": [
-                [
-                    {"text": "📈 Forex", "callback_data": "market_forex"},
-                    {"text": "📊 Indices", "callback_data": "market_indices"}
-                ],
-                [
-                    {"text": "🛢 Commodities", "callback_data": "market_commodities"},
-                    {"text": "₿ Crypto", "callback_data": "market_crypto"}
-                ]
+                [{"text": "Forex", "callback_data": "market_forex"}],
+                [{"text": "Indices", "callback_data": "market_indices"}],
+                [{"text": "Commodities", "callback_data": "market_commodities"}],
+                [{"text": "Crypto", "callback_data": "market_crypto"}]
             ]
         }
         
