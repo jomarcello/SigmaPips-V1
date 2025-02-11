@@ -1,4 +1,4 @@
-from telegram import Bot, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import Bot, InlineKeyboardButton, InlineKeyboardMarkup, InputMediaPhoto
 from typing import Dict, Any, List
 import logging
 import os
@@ -163,13 +163,17 @@ class TradingBot:
                     logger.info("Screenshot generated, sending to Telegram")
                     # Send screenshot with Back button
                     keyboard = InlineKeyboardMarkup([
-                        [InlineKeyboardButton("🔙 Back", callback_data=f"back_{message_id}")]
+                        [InlineKeyboardButton("⬅️ Back to Signal", callback_data=f"back_{message_id}")]
                     ])
                     
-                    await self._bot.send_photo(
+                    # Update existing message with chart
+                    await self._bot.edit_message_media(
                         chat_id=chat_id,
-                        photo=screenshot,
-                        caption=f"📊 Technical Analysis for {symbol} ({timeframe})",
+                        message_id=message_id,
+                        media=InputMediaPhoto(
+                            media=screenshot,
+                            caption=f"📊 Technical Analysis for {symbol} ({timeframe})",
+                        ),
                         reply_markup=keyboard
                     )
                     logger.info("Screenshot sent successfully")

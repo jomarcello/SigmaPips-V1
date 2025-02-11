@@ -18,6 +18,10 @@ class ChartService:
         try:
             logger.info(f"Starting chart generation for {symbol} ({interval})")
             
+            # Add FXCM broker to symbol
+            symbol = f"{symbol}:FXCM"
+            logger.info(f"Using symbol with broker: {symbol}")
+            
             # Debug: Print environment variables
             logger.info(f"CHROME_BIN: {os.getenv('CHROME_BIN')}")
             logger.info(f"CHROMEDRIVER_PATH: {os.getenv('CHROMEDRIVER_PATH')}")
