@@ -3,6 +3,7 @@ import logging
 import os
 from typing import Dict, Any
 import asyncio
+from supabase import create_client
 
 from trading_bot.services.telegram_service import TelegramService
 from trading_bot.services.news_ai_service import NewsAIService
@@ -18,10 +19,7 @@ app = FastAPI()
 port = int(os.getenv("PORT", 8080))
 
 # Initialize services
-db = Database(
-    url=os.getenv("SUPABASE_URL"),
-    key=os.getenv("SUPABASE_KEY")
-)
+db = Database()
 telegram = TelegramService(
     token=os.getenv("TELEGRAM_BOT_TOKEN"),
     db=db

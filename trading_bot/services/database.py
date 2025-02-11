@@ -6,12 +6,11 @@ import os
 logger = logging.getLogger(__name__)
 
 class Database:
-    def __init__(self, url: str = None, key: str = None):
+    def __init__(self):
         """Initialize database connection"""
-        if not url or not key:
-            url = os.getenv("SUPABASE_URL")
-            key = os.getenv("SUPABASE_KEY")
-            
+        url = os.getenv("SUPABASE_URL")
+        key = os.getenv("SUPABASE_KEY")
+        
         if not url or not key:
             raise ValueError("Missing Supabase credentials")
             
