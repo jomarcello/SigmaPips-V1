@@ -80,17 +80,17 @@ class TradingBot:
             keyboard = InlineKeyboardMarkup([
                 [
                     InlineKeyboardButton(
-                        "📊 Technische Analyse", 
+                        "📊 Technical Analysis", 
                         callback_data=f"chart_{signal['symbol']}_{signal['timeframe']}"
                     ),
                     InlineKeyboardButton(
-                        "🤖 Markt Sentiment", 
+                        "🤖 Market Sentiment", 
                         callback_data=f"sentiment_{signal['symbol']}"
                     )
                 ],
                 [
                     InlineKeyboardButton(
-                        "📅 Economische Kalender", 
+                        "📅 Economic Calendar", 
                         callback_data=f"calendar_{signal['symbol']}"
                     )
                 ]
