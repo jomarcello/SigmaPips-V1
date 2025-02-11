@@ -2,6 +2,7 @@ import aiohttp
 import logging
 from typing import Dict, Any
 import os
+from services.database import Database
 
 logger = logging.getLogger(__name__)
 
