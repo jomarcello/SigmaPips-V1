@@ -74,7 +74,11 @@ async def webhook(request: Request):
     try:
         payload = await request.json()
         
-        # Check if this is a Telegram update
+        # Check if this is a callback query
+        if 'callback_query' in payload:
+            return await telegram.handle_callback_query(payload['callback_query'])
+            
+        # Check if this is a Telegram message
         if 'message' in payload and 'text' in payload['message']:
             return await handle_telegram_command(payload['message'])
             
