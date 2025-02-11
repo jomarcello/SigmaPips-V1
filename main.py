@@ -23,7 +23,7 @@ db = Database(
     key=os.getenv("SUPABASE_KEY")
 )
 telegram = TelegramService(
-    token=os.getenv("TELEGRAM_TOKEN"),
+    token=os.getenv("TELEGRAM_BOT_TOKEN"),
     db=db
 )
 news_ai = NewsAIService(db)
