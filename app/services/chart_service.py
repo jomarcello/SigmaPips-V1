@@ -18,6 +18,10 @@ class ChartService:
         try:
             logger.info(f"Starting chart generation for {symbol} ({interval})")
             
+            # Convert interval to lowercase
+            interval = interval.lower()
+            logger.info(f"Using lowercase interval: {interval}")
+            
             # Add FXCM broker to symbol
             symbol = f"{symbol}:FXCM"
             logger.info(f"Using symbol with broker: {symbol}")
@@ -42,7 +46,7 @@ class ChartService:
                 logger.info("Chrome driver initialized successfully")
                 
                 try:
-                    # TradingView URL
+                    # TradingView URL met correcte parameters
                     url = f"https://www.tradingview.com/chart/?symbol={symbol}&interval={interval}"
                     logger.info(f"Opening URL: {url}")
                     
