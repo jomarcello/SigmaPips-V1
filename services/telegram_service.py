@@ -6,8 +6,8 @@ import os
 logger = logging.getLogger(__name__)
 
 class TelegramService:
-    def __init__(self, db):
-        self.token = os.getenv("TELEGRAM_BOT_TOKEN")
+    def __init__(self, token: str, db: Database):
+        self.token = token
         self.db = db
         
     async def send_signal(self, chat_id: str, signal: Dict[str, Any], sentiment: str, 
