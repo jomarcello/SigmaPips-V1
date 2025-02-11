@@ -5,16 +5,11 @@ FROM python:3.11-slim
 RUN apt-get update && apt-get install -y \
     chromium \
     chromium-driver \
-    xvfb \
     && rm -rf /var/lib/apt/lists/*
 
 # Set environment variables for Chrome
 ENV CHROME_BIN=/usr/bin/chromium
 ENV CHROMEDRIVER_PATH=/usr/bin/chromedriver
-ENV DISPLAY=:99
-
-# Create Xvfb virtual display
-RUN Xvfb :99 -screen 0 1920x1080x24 > /dev/null 2>&1 &
 
 # Set working directory
 WORKDIR /app
