@@ -77,26 +77,31 @@ class TradingBot:
             )
 
             # Create inline keyboard
-            keyboard = [
+            keyboard = InlineKeyboardMarkup([
                 [
-                    InlineKeyboardButton("📊 Technische Analyse", 
-                                       callback_data=f"chart_{signal['symbol']}_{signal['timeframe']}"),
-                    InlineKeyboardButton("🤖 Markt Sentiment", 
-                                       callback_data=f"sentiment_{signal['symbol']}")
+                    InlineKeyboardButton(
+                        "📊 Technische Analyse", 
+                        callback_data=f"chart_{signal['symbol']}_{signal['timeframe']}"
+                    ),
+                    InlineKeyboardButton(
+                        "🤖 Markt Sentiment", 
+                        callback_data=f"sentiment_{signal['symbol']}"
+                    )
                 ],
                 [
-                    InlineKeyboardButton("📅 Economische Kalender", 
-                                       callback_data=f"calendar_{signal['symbol']}")
+                    InlineKeyboardButton(
+                        "📅 Economische Kalender", 
+                        callback_data=f"calendar_{signal['symbol']}"
+                    )
                 ]
-            ]
-            reply_markup = InlineKeyboardMarkup(keyboard)
+            ])
 
-            # Send message
+            # Send message with buttons
             await self.bot.send_message(
                 chat_id=chat_id,
                 text=message,
                 parse_mode='Markdown',
-                reply_markup=reply_markup
+                reply_markup=keyboard
             )
 
         except Exception as e:
