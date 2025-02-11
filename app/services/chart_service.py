@@ -17,18 +17,19 @@ class ChartService:
         chrome_options.add_argument('--headless')
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('--disable-dev-shm-usage')
+        chrome_options.add_argument('--window-size=1920,1080')
         return chrome_options
         
     async def generate_chart(self, symbol: str, interval: str) -> Optional[bytes]:
-        """Generate chart image for symbol"""
+        """Generate chart screenshot for symbol"""
         try:
-            # TradingView URL
-            url = f"https://www.tradingview.com/chart/?symbol={symbol}&interval={interval}"
-            
             # Setup Chrome
             driver = webdriver.Chrome(options=self.chrome_options)
             
             try:
+                # TradingView URL
+                url = f"https://www.tradingview.com/chart/?symbol={symbol}&interval={interval}"
+                
                 # Get page
                 driver.get(url)
                 time.sleep(5)  # Wait for chart to load

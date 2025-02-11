@@ -152,22 +152,27 @@ class TradingBot:
 
             if data.startswith("chart_"):
                 _, symbol, timeframe = data.split("_")
-                # Generate chart URL
-                chart_url = f"https://www.tradingview.com/chart/?symbol={symbol}&interval={timeframe}"
+                # Generate chart screenshot
+                screenshot = await self.chart_service.generate_chart(symbol, timeframe)
                 
-                # Create keyboard with Back button
-                keyboard = InlineKeyboardMarkup([
-                    [InlineKeyboardButton("🔙 Back", callback_data=f"back_{message_id}")]
-                ])
-                
-                # Send chart link with Back button
-                await self._bot.send_message(
-                    chat_id=chat_id,
-                    text=f"📊 [View Technical Analysis for {symbol}]({chart_url})",
-                    parse_mode='Markdown',
-                    reply_markup=keyboard
-                )
-                
+                if screenshot:
+                    # Send screenshot with Back button
+                    keyboard = InlineKeyboardMarkup([
+                        [InlineKeyboardButton("🔙 Back", callback_data=f"back_{message_id}")]
+                    ])
+                    
+                    await self._bot.send_photo(
+                        chat_id=chat_id,
+                        photo=screenshot,
+                        caption=f"📊 Technical Analysis for {symbol} ({timeframe})",
+                        reply_markup=keyboard
+                    )
+                else:
+                    await self._bot.send_message(
+                        chat_id=chat_id,
+                        text="❌ Sorry, could not generate chart at this time."
+                    )
+                    
             elif data.startswith("back_"):
                 # Return to original message
                 original_message_id = int(data.split("_")[1])
