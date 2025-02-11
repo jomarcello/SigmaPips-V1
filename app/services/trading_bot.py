@@ -150,12 +150,17 @@ class TradingBot:
             chat_id = callback_query["message"]["chat"]["id"]
             message_id = callback_query["message"]["message_id"]
 
+            logger.info(f"Handling button click: {data}")
+
             if data.startswith("chart_"):
                 _, symbol, timeframe = data.split("_")
+                logger.info(f"Generating chart for {symbol} ({timeframe})")
+                
                 # Generate chart screenshot
                 screenshot = await self.chart_service.generate_chart(symbol, timeframe)
                 
                 if screenshot:
+                    logger.info("Screenshot generated, sending to Telegram")
                     # Send screenshot with Back button
                     keyboard = InlineKeyboardMarkup([
                         [InlineKeyboardButton("🔙 Back", callback_data=f"back_{message_id}")]
@@ -167,7 +172,9 @@ class TradingBot:
                         caption=f"📊 Technical Analysis for {symbol} ({timeframe})",
                         reply_markup=keyboard
                     )
+                    logger.info("Screenshot sent successfully")
                 else:
+                    logger.error("Failed to generate screenshot")
                     await self._bot.send_message(
                         chat_id=chat_id,
                         text="❌ Sorry, could not generate chart at this time."

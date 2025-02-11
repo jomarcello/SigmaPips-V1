@@ -25,26 +25,34 @@ class ChartService:
     async def generate_chart(self, symbol: str, interval: str) -> Optional[bytes]:
         """Generate chart screenshot for symbol"""
         try:
+            logger.info(f"Starting chart generation for {symbol} ({interval})")
+            
+            logger.info("Initializing Chrome with options...")
             service = Service(executable_path=os.getenv('CHROMEDRIVER_PATH', '/usr/bin/chromedriver'))
             driver = webdriver.Chrome(service=service, options=self.chrome_options)
             
             try:
                 # TradingView URL
                 url = f"https://www.tradingview.com/chart/?symbol={symbol}&interval={interval}"
+                logger.info(f"Opening URL: {url}")
                 
                 # Get page
                 driver.get(url)
+                logger.info("Waiting for chart to load...")
                 time.sleep(5)  # Wait for chart to load
                 
                 # Take screenshot
+                logger.info("Taking screenshot...")
                 screenshot = driver.get_screenshot_as_png()
+                logger.info("Screenshot taken successfully")
                 return screenshot
                 
             finally:
+                logger.info("Closing Chrome driver")
                 driver.quit()
                 
         except Exception as e:
-            logger.error(f"Error generating chart: {str(e)}")
+            logger.error(f"Error generating chart: {str(e)}", exc_info=True)
             return None
             
     def _convert_interval(self, interval: str) -> str:
