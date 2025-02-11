@@ -285,24 +285,11 @@ async def process_telegram_update(data: dict):
 
 @app.post("/webhook")
 async def webhook(request: Request):
-    """Handle webhook updates"""
-    try:
-        # Log webhook call
-        logger.info("Webhook called")
-        
-        # Get update data
-        data = await request.json()
-        logger.info(f"Received update: {data}")
-        
-        # Process update
-        if update := Update.de_json(data, telegram_bot):
-            await application.process_update(update)
-            logger.info("Update processed successfully")
-        
-        return {"ok": True}
-    except Exception as e:
-        logger.error(f"Webhook error: {e}", exc_info=True)
-        return {"ok": False, "error": str(e)}
+    """Handle incoming webhook updates"""
+    data = await request.json()
+    update = Update.de_json(data, telegram_bot)
+    await application.process_update(update)
+    return {"status": "ok"}
 
 async def echo_message(update: Update, context):
     """Echo the user message."""
