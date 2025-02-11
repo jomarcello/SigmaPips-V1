@@ -3,6 +3,7 @@ import os
 from typing import Optional
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
 import time
 import io
 
@@ -14,6 +15,7 @@ class ChartService:
         
     def _setup_chrome_options(self):
         chrome_options = Options()
+        chrome_options.binary_location = os.getenv('CHROME_BIN', '/usr/bin/chromium')
         chrome_options.add_argument('--headless')
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('--disable-dev-shm-usage')
@@ -23,8 +25,8 @@ class ChartService:
     async def generate_chart(self, symbol: str, interval: str) -> Optional[bytes]:
         """Generate chart screenshot for symbol"""
         try:
-            # Setup Chrome
-            driver = webdriver.Chrome(options=self.chrome_options)
+            service = Service(executable_path=os.getenv('CHROMEDRIVER_PATH', '/usr/bin/chromedriver'))
+            driver = webdriver.Chrome(service=service, options=self.chrome_options)
             
             try:
                 # TradingView URL

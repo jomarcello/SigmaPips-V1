@@ -1,27 +1,27 @@
-# Gebruik officiële Python image
-FROM python:3.11-slim-bookworm
+# Base image
+FROM python:3.11-slim
 
-# Zet vereiste environment variables
-ENV PYTHONUNBUFFERED=1 \
-    PIP_NO_CACHE_DIR=1
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    chromium \
+    chromium-driver \
+    && rm -rf /var/lib/apt/lists/*
 
-# Debug: Toon werkdirectory
-WORKDIR /app
+# Set environment variables for Chrome
+ENV CHROME_BIN=/usr/bin/chromium
+ENV CHROMEDRIVER_PATH=/usr/bin/chromedriver
 
-# Kopieer alleen de benodigde files
-COPY app/ ./app/
+# Set display port to avoid crash
+ENV DISPLAY=:99
+
+# Install Python dependencies
 COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Installeer dependencies
-RUN pip install -r requirements.txt
+# Copy application code
+COPY . .
 
-# Expose the port that Railway expects
-EXPOSE 8080
-
-# Set environment variables
-ENV PORT=8080
-
-# Start command
-CMD ["python", "-m", "app.main"]
+# Command to run the application
+CMD ["python", "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]
 
 
