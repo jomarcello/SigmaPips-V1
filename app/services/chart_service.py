@@ -1,55 +1,45 @@
 import logging
 import os
 from typing import Optional
-from tradingview_ta import TA_Handler
-from PIL import Image
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+import time
 import io
-import aiohttp
 
 logger = logging.getLogger(__name__)
 
 class ChartService:
     def __init__(self):
-        self.tradingview_token = os.getenv("TRADINGVIEW_TOKEN")
+        self.chrome_options = self._setup_chrome_options()
+        
+    def _setup_chrome_options(self):
+        chrome_options = Options()
+        chrome_options.add_argument('--headless')
+        chrome_options.add_argument('--no-sandbox')
+        chrome_options.add_argument('--disable-dev-shm-usage')
+        return chrome_options
         
     async def generate_chart(self, symbol: str, interval: str) -> Optional[bytes]:
         """Generate chart image for symbol"""
         try:
-            # Initialize TradingView handler
-            handler = TA_Handler(
-                symbol=symbol,
-                screener="forex" if "USD" in symbol else "crypto",
-                exchange="OANDA" if "USD" in symbol else "BINANCE",
-                interval=self._convert_interval(interval)
-            )
+            # TradingView URL
+            url = f"https://www.tradingview.com/chart/?symbol={symbol}&interval={interval}"
             
-            # Get chart URL
-            chart_url = f"https://www.tradingview.com/chart/?symbol={symbol}&interval={interval}"
+            # Setup Chrome
+            driver = webdriver.Chrome(options=self.chrome_options)
             
-            # Download chart image
-            async with aiohttp.ClientSession() as session:
-                async with session.get(chart_url, headers={
-                    "Authorization": f"Bearer {self.tradingview_token}"
-                }) as response:
-                    if response.status == 200:
-                        image_data = await response.read()
-                        
-                        # Process image
-                        img = Image.open(io.BytesIO(image_data))
-                        
-                        # Add indicators
-                        analysis = handler.get_analysis()
-                        
-                        # Convert to bytes
-                        img_byte_arr = io.BytesIO()
-                        img.save(img_byte_arr, format='PNG')
-                        img_byte_arr = img_byte_arr.getvalue()
-                        
-                        return img_byte_arr
-                    else:
-                        logger.error(f"Error getting chart: {response.status}")
-                        return None
-                        
+            try:
+                # Get page
+                driver.get(url)
+                time.sleep(5)  # Wait for chart to load
+                
+                # Take screenshot
+                screenshot = driver.get_screenshot_as_png()
+                return screenshot
+                
+            finally:
+                driver.quit()
+                
         except Exception as e:
             logger.error(f"Error generating chart: {str(e)}")
             return None
