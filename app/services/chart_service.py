@@ -64,13 +64,13 @@ class ChartService:
                         EC.presence_of_element_located((By.CSS_SELECTOR, 'div[class*="chart-container"]'))
                     )
                     
-                    # Zoom in op de chart om grijze balken te verwijderen
+                    # Zoom in op de chart (meer zoom voor minder grijze randen)
                     logger.info("Zooming chart...")
                     driver.execute_script("""
                         // Zoom in op de chart
                         const chart = document.querySelector('div[class*="chart-container"]');
                         if (chart) {
-                            chart.style.transform = 'scale(1.2)';  // 20% inzoomen
+                            chart.style.transform = 'scale(1.5)';  // 50% inzoomen voor beter resultaat
                             chart.style.transformOrigin = 'center center';
                         }
                     """)
