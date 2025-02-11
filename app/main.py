@@ -103,9 +103,20 @@ async def button_callback(update: Update, context):
     logger.debug(f"Received callback query: {query.data}")
     
     try:
-        await query.answer()
+        await query.answer()  # Acknowledge the button click
         
-        if query.data.startswith("market_"):
+        if query.data.startswith("chart_") or query.data.startswith("sentiment_") or query.data.startswith("calendar_"):
+            # Use TradingBot for signal-related buttons
+            await bot.handle_button_click({
+                "data": query.data,
+                "message": {
+                    "chat": {
+                        "id": query.message.chat_id
+                    }
+                }
+            })
+        elif query.data.startswith("market_"):
+            # Original market selection flow
             market_id = query.data.replace("market_", "")
             if market_id in MARKETS:
                 market = MARKETS[market_id]
@@ -113,7 +124,6 @@ async def button_callback(update: Update, context):
                     [InlineKeyboardButton(instrument, callback_data=f"instrument_{market_id}_{instrument}")]
                     for instrument in market["instruments"]
                 ]
-                # Add back button
                 keyboard.append([InlineKeyboardButton("🔙 Back to Markets", callback_data="back_to_markets")])
                 reply_markup = InlineKeyboardMarkup(keyboard)
                 await query.message.edit_text(
@@ -237,9 +247,9 @@ async def button_callback(update: Update, context):
                 )
                 
     except Exception as e:
-        logger.error(f"Error in button callback: {str(e)}", exc_info=True)
-        await query.message.edit_text(
-            "❌ An error occurred. Please try again.",
+        logger.error(f"Error in button callback: {str(e)}")
+        await query.message.reply_text(
+            "❌ Sorry, something went wrong. Please try again.",
             reply_markup=InlineKeyboardMarkup([[
                 InlineKeyboardButton("🔙 Back to Markets", callback_data="back_to_markets")
             ]])
