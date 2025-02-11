@@ -159,37 +159,63 @@ Actions:
         try:
             data = callback_query['data']
             chat_id = callback_query['message']['chat']['id']
+            message_id = callback_query['message']['message_id']  # Voor het updaten van het bericht
             
+            # Sla de huidige selectie op in Redis/state
             if data.startswith('market_'):
                 market = data.split('_')[1]
+                # Sla market op voor deze user
+                await self.db.save_user_state(chat_id, {'market': market})
+                # Toon instrumenten voor deze markt
                 await self._ask_instrument(chat_id, market)
+                
+            elif data.startswith('instrument_'):
+                instrument = data.split('_')[1]
+                # Sla instrument op
+                await self.db.save_user_state(chat_id, {'instrument': instrument})
+                # Vraag timeframe
+                await self._ask_timeframe(chat_id, instrument)
+                
             elif data.startswith('timeframe_'):
                 timeframe = data.split('_')[1]
-                # Na timeframe selectie, sla de combinatie op
-                await self._save_preference(chat_id, timeframe)
-                # Vraag of ze nog een combinatie willen toevoegen
+                # Haal opgeslagen state op
+                state = await self.db.get_user_state(chat_id)
+                # Sla complete preference op
+                await self.db.save_preference(chat_id, {
+                    'market': state['market'],
+                    'instrument': state['instrument'],
+                    'timeframe': timeframe
+                })
+                # Vraag of user meer wil toevoegen
                 await self._ask_add_more(chat_id)
-            elif data.startswith('delete_pref_'):
-                pref_id = data.split('_')[2]
-                await self._delete_preference(chat_id, pref_id)
-                await self.show_preferences(chat_id)
-            elif data == 'add_more_yes':
-                await self.send_welcome_message(chat_id)
-            elif data == 'add_more_no':
-                await self.show_preferences(chat_id)
+                
             elif data == 'back_to_markets':
-                # Terug naar markt selectie
                 await self.send_welcome_message(chat_id)
+                
             elif data == 'back_to_instruments':
-                # Terug naar instrument selectie
-                # We moeten de laatst gekozen markt onthouden
-                market = "forex"  # Dit moet dynamisch worden opgehaald
-                await self._ask_instrument(chat_id, market)
-            
+                state = await self.db.get_user_state(chat_id)
+                await self._ask_instrument(chat_id, state['market'])
+                
+            # Answer callback query om loading state te verwijderen
+            async with aiohttp.ClientSession() as session:
+                await session.post(
+                    f"https://api.telegram.org/bot{self.token}/answerCallbackQuery",
+                    json={"callback_query_id": callback_query['id']}
+                )
+                
             return {"status": "callback_handled"}
             
         except Exception as e:
             logger.error(f"Error handling callback: {str(e)}")
+            # Answer callback query zelfs bij error
+            async with aiohttp.ClientSession() as session:
+                await session.post(
+                    f"https://api.telegram.org/bot{self.token}/answerCallbackQuery",
+                    json={
+                        "callback_query_id": callback_query['id'],
+                        "text": "An error occurred. Please try again."
+                    }
+                )
             raise
 
     async def _ask_instrument(self, chat_id: str, market: str):
