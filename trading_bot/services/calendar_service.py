@@ -15,4 +15,4 @@ class CalendarService:
             return []
         except Exception as e:
             logger.error(f"Error getting events: {str(e)}")
-            return [] 
+            return []

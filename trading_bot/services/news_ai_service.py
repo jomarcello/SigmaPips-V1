@@ -43,4 +43,4 @@ class NewsAIService:
             return response.choices[0].message.content
         except Exception as e:
             logger.error(f"OpenAI API error: {str(e)}")
-            return "Error getting sentiment analysis" 
+            return "Error getting sentiment analysis"
