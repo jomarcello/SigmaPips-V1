@@ -106,7 +106,8 @@ async def button_callback(update: Update, context):
     logger.debug(f"Received callback query: {query.data}")
     
     try:
-        await query.answer()  # Acknowledge the button click
+        # Gebruik telegram_bot voor Telegram acties
+        await telegram_bot.answer_callback_query(callback_query_id=query.id)
         
         if query.data.startswith("chart_") or query.data.startswith("sentiment_") or query.data.startswith("calendar_"):
             # Use TradingBot for signal-related buttons
@@ -115,7 +116,8 @@ async def button_callback(update: Update, context):
                 "message": {
                     "chat": {
                         "id": query.message.chat_id
-                    }
+                    },
+                    "message_id": query.message.message_id
                 }
             })
         elif query.data.startswith("market_"):
@@ -251,8 +253,10 @@ async def button_callback(update: Update, context):
                 
     except Exception as e:
         logger.error(f"Error in button callback: {str(e)}")
-        await query.message.reply_text(
-            "❌ Sorry, something went wrong. Please try again.",
+        # Gebruik telegram_bot voor error berichten
+        await telegram_bot.send_message(
+            chat_id=query.message.chat_id,
+            text="❌ Sorry, something went wrong. Please try again.",
             reply_markup=InlineKeyboardMarkup([[
                 InlineKeyboardButton("🔙 Back to Markets", callback_data="back_to_markets")
             ]])
@@ -273,7 +277,7 @@ async def health():
 async def process_telegram_update(data: dict):
     """Process Telegram update in background"""
     try:
-        if update := Update.de_json(data, trading_bot):
+        if update := Update.de_json(data, telegram_bot):
             await application.process_update(update)
             logger.info("Update processed successfully")
     except Exception as e:
@@ -291,7 +295,7 @@ async def webhook(request: Request):
         logger.info(f"Received update: {data}")
         
         # Process update
-        if update := Update.de_json(data, trading_bot):
+        if update := Update.de_json(data, telegram_bot):
             await application.process_update(update)
             logger.info("Update processed successfully")
         
