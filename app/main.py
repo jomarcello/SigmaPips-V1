@@ -25,14 +25,17 @@ async def startup_event():
         logger.info("Starting application...")
         
         # Initialize bot
-        global application
+        global application, telegram_bot
         TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
         if not TOKEN:
             raise ValueError("No TELEGRAM_BOT_TOKEN found in environment")
             
         logger.info("Initializing bot...")
-        bot = Bot(TOKEN)
-        await bot.initialize()  # Initialize bot first
+        telegram_bot = Bot(TOKEN)
+        await telegram_bot.initialize()
+        
+        # Initialize TradingBot with the same bot instance
+        bot.initialize(telegram_bot)
         
         # Initialize application
         logger.info("Initializing application...")

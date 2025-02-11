@@ -19,9 +19,19 @@ supabase = create_client(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_KEY"))
 class TradingBot:
     def __init__(self):
         self.token = os.getenv("TELEGRAM_BOT_TOKEN")
-        self.bot = Bot(self.token)
+        self._bot = None  # We zullen de bot later initialiseren
         self.chart_service = ChartService()
         
+    @property
+    def bot(self) -> Bot:
+        if self._bot is None:
+            self._bot = Bot(self.token)
+        return self._bot
+
+    def initialize(self, bot: Bot):
+        """Initialize with existing bot instance"""
+        self._bot = bot
+
     async def match_subscribers(self, signal: Dict) -> List[str]:
         """Match signal with subscribers"""
         try:
@@ -99,7 +109,7 @@ class TradingBot:
             ])
 
             # Send message with buttons
-            await self.bot.send_message(
+            await self._bot.send_message(
                 chat_id=chat_id,
                 text=message,
                 parse_mode='Markdown',
@@ -144,18 +154,23 @@ class TradingBot:
                 # Generate and send chart
                 chart_bytes = await self.chart_service.generate_chart(symbol, timeframe)
                 if chart_bytes:
-                    await self.bot.send_photo(
+                    await self._bot.send_photo(
                         chat_id=chat_id,
                         photo=chart_bytes,
                         caption=f"📊 Technical Analysis for {symbol} ({timeframe})"
                     )
                 else:
-                    await self.bot.send_message(
+                    await self._bot.send_message(
                         chat_id=chat_id,
                         text="❌ Sorry, could not generate chart at this time."
                     )
 
         except Exception as e:
             logger.error(f"Error handling button click: {str(e)}")
+            await self._bot.send_message(
+                chat_id=chat_id,
+                text="❌ An error occurred while processing your request."
+            )
 
-bot = TradingBot() 
+# Initialize singleton instance
+trading_bot = TradingBot() 
