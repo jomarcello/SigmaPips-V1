@@ -1,8 +1,9 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 import logging
 import os
 from typing import Dict, Any
 import asyncio
+from redis import Redis
 
 from services.telegram_service import TelegramService
 from services.news_ai_service import NewsAIService
@@ -22,6 +23,13 @@ telegram = TelegramService(db)
 news_ai = NewsAIService(db)
 chart = ChartService()
 calendar = CalendarService(db)
+
+# Update Redis configuratie
+redis_client = Redis(
+    host=os.getenv('REDIS_HOST', 'redis'),
+    port=int(os.getenv('REDIS_PORT', 6379)),
+    decode_responses=True
+)
 
 @app.get("/health")
 async def health_check():
@@ -58,6 +66,16 @@ async def process_signal(signal: Dict[str, Any]):
         
     except Exception as e:
         logger.error(f"Error processing signal: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/webhook")
+async def webhook(request: Request):
+    """Handle TradingView webhook"""
+    try:
+        payload = await request.json()
+        return await process_signal(payload)
+    except Exception as e:
+        logger.error(f"Webhook error: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":

@@ -10,10 +10,13 @@ class TelegramService:
         self.token = os.getenv("TELEGRAM_BOT_TOKEN")
         self.db = db
         
-    async def send_signal(self, chat_id: str, signal: Dict, sentiment: str, 
-                         chart: bytes, events: list):
+    async def send_signal(self, chat_id: str, signal: Dict[str, Any], sentiment: str, 
+                         chart: bytes, events: list, **kwargs):
         """Send complete signal message to subscriber"""
         try:
+            # Convert 'type' to 'action' if needed
+            signal['action'] = signal.get('type', signal.get('action', 'UNKNOWN'))
+            
             # Format message
             message = await self._format_signal_message(signal, sentiment, events)
             
