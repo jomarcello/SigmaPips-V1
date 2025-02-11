@@ -70,12 +70,34 @@ async def process_signal(signal: Dict[str, Any]):
 
 @app.post("/webhook")
 async def webhook(request: Request):
-    """Handle TradingView webhook"""
+    """Handle TradingView webhook and Telegram updates"""
     try:
         payload = await request.json()
+        
+        # Check if this is a Telegram update
+        if 'message' in payload and 'text' in payload['message']:
+            return await handle_telegram_command(payload['message'])
+            
+        # Otherwise treat it as a trading signal
         return await process_signal(payload)
+        
     except Exception as e:
         logger.error(f"Webhook error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+async def handle_telegram_command(message: Dict[str, Any]):
+    """Handle Telegram bot commands"""
+    try:
+        command = message['text']
+        chat_id = message['chat']['id']
+        
+        if command == '/start':
+            return await telegram.send_welcome_message(chat_id)
+            
+        return {"status": "unknown_command"}
+        
+    except Exception as e:
+        logger.error(f"Error handling command: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":

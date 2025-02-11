@@ -72,3 +72,19 @@ Take Profit: {signal['takeProfit']}
         if not events:
             return "No relevant events"
         return "\n".join([f"• {event}" for event in events]) 
+
+    async def send_welcome_message(self, chat_id: str):
+        """Send welcome message to new users"""
+        message = """
+🤖 *Welcome to SigmaPips Trading Bot!*
+
+I will send you trading signals based on your preferences.
+Use these commands to manage your settings:
+
+/settings - View and update your preferences
+/help - Show all available commands
+"""
+        
+        async with aiohttp.ClientSession() as session:
+            await self._send_message(session, chat_id, message)
+        return {"status": "welcome_sent"} 
