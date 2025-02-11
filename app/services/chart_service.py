@@ -49,8 +49,8 @@ class ChartService:
                 logger.info("Chrome driver initialized successfully")
                 
                 try:
-                    # TradingView URL met fullscreen parameter
-                    url = f"https://www.tradingview.com/chart/?symbol={symbol}&interval={interval}&fullscreen"
+                    # TradingView URL met broker en fullscreen parameters
+                    url = f"https://www.tradingview.com/chart/?symbol={symbol}&interval={interval}&broker=FXCM&fullscreen"
                     logger.info(f"Opening URL: {url}")
                     
                     # Get page
@@ -62,15 +62,34 @@ class ChartService:
                         EC.presence_of_element_located((By.CSS_SELECTOR, 'div[class*="chart-container"]'))
                     )
                     
-                    # Hide UI elements
+                    # Hide ALL UI elements
                     logger.info("Hiding UI elements...")
                     driver.execute_script("""
-                        document.querySelectorAll('div[class*="header"]').forEach(e => e.style.display = 'none');
-                        document.querySelectorAll('div[class*="pane-legend"]').forEach(e => e.style.display = 'none');
-                        document.querySelectorAll('div[class*="layout__area--left"]').forEach(e => e.style.display = 'none');
-                        document.querySelectorAll('div[class*="layout__area--right"]').forEach(e => e.style.display = 'none');
-                        document.querySelectorAll('div[class*="popup"]').forEach(e => e.style.display = 'none');
-                        document.querySelectorAll('div[class*="button"]').forEach(e => e.style.display = 'none');
+                        // Verberg alle UI elementen
+                        const elementsToHide = [
+                            'div[class*="header"]',           // Bovenste balk
+                            'div[class*="pane-legend"]',      // Rechter zijbalk
+                            'div[class*="layout__area--left"]',   // Linker zijbalk
+                            'div[class*="layout__area--right"]',  // Rechter zijbalk
+                            'div[class*="layout__area--bottom"]', // Footer
+                            'div[class*="pane-toolbox"]',     // Indicator knoppen
+                            'div[class*="button"]',           // Alle knoppen
+                            'div[class*="toolbar"]',          // Toolbars
+                            'div[class*="drawingToolbar"]',   // Teken toolbar
+                            'div[class*="group-2JyOhh7Z"]',   // Extra UI elementen
+                            'div[class*="chart-controls"]'    // Chart controls
+                        ];
+                        
+                        elementsToHide.forEach(selector => {
+                            document.querySelectorAll(selector).forEach(e => {
+                                e.style.display = 'none';
+                                e.remove();  // Volledig verwijderen
+                            });
+                        });
+                        
+                        // Maximaliseer chart gebied
+                        document.querySelector('div[class*="chart-container"]').style.width = '100%';
+                        document.querySelector('div[class*="chart-container"]').style.height = '100vh';
                     """)
                     
                     # Extra wachttijd voor UI updates
