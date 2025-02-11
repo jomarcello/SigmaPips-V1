@@ -55,6 +55,20 @@ class ChartService:
                     logger.info("Waiting for chart to load...")
                     time.sleep(5)  # Wait for chart to load
                     
+                    # Hide sidebar and maximize chart
+                    logger.info("Maximizing chart view...")
+                    driver.execute_script("""
+                        // Hide left sidebar
+                        document.querySelector('[data-name="left-toolbar"]').style.display = 'none';
+                        // Hide right toolbar
+                        document.querySelector('[data-name="right-toolbar"]').style.display = 'none';
+                        // Hide header
+                        document.querySelector('header').style.display = 'none';
+                        // Maximize chart
+                        document.documentElement.requestFullscreen();
+                    """)
+                    time.sleep(1)  # Wait for UI changes
+                    
                     # Take screenshot
                     logger.info("Taking screenshot...")
                     screenshot = driver.get_screenshot_as_png()
