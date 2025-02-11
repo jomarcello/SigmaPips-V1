@@ -9,15 +9,22 @@ class Database:
         self.supabase = create_client(url, key)
 
     async def save_user_state(self, chat_id: str, state: dict):
-        """Save user state in subscriber_preferences table"""
+        """Save user state using existing columns"""
         try:
-            # Update bestaande preference of maak nieuwe aan
+            # Converteer state naar database kolommen
             data = {
-                'user_id': int(chat_id),
-                'state': state,
-                'updated_at': datetime.now().isoformat()
+                'user_id': int(chat_id)
             }
             
+            # Voeg alleen bestaande kolommen toe
+            if 'market' in state:
+                data['market'] = state['market']
+            if 'instrument' in state:
+                data['instrument'] = state['instrument']
+            if 'timeframe' in state:
+                data['timeframe'] = state['timeframe']
+            
+            # Update bestaande rij of maak nieuwe aan
             response = self.supabase.table('subscriber_preferences')\
                 .upsert(data)\
                 .execute()
@@ -28,20 +35,21 @@ class Database:
             raise
 
     async def get_user_state(self, chat_id: str) -> dict:
-        """Get user state from subscriber_preferences table"""
+        """Get user state from existing columns"""
         try:
             response = self.supabase.table('subscriber_preferences')\
-                .select('state')\
+                .select('market,instrument,timeframe')\
                 .eq('user_id', int(chat_id))\
                 .execute()
                 
-            if response.data and 'state' in response.data[0]:
-                return response.data[0]['state']
+            if response.data:
+                # Filter out None values
+                return {k: v for k, v in response.data[0].items() if v is not None}
             return {}
             
         except Exception as e:
             logger.error(f"Error getting user state: {str(e)}")
-            return {}  # Return empty state on error 
+            return {}
 
     async def save_preference(self, chat_id: str, preference: dict):
         """Save user preference in subscriber_preferences table"""
