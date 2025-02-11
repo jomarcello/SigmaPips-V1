@@ -1,21 +1,15 @@
 # Core dependencies
 fastapi==0.109.0
-python-telegram-bot==20.7
+python-telegram-bot==20.3
+httpx>=0.25.2,<0.26.0  # Expliciete versie range
 uvicorn==0.27.0
-httpx==0.26.0
 python-dotenv==1.0.0
 
-# Database
-supabase==2.3.0
-redis==5.0.1
-
-# Chart generation
+# Overige dependencies blijven hetzelfde...
 selenium==4.16.0
 pillow==10.2.0
-webdriver_manager==4.0.1
-
-# AI/ML
-openai==1.10.0
-
-# Utils
-python-multipart==0.0.6
+python-multipart==0.0.7
+pydantic==2.5.3
+webdriver-manager==4.0.1
+requests==2.31.0
+typing-extensions==4.9.0
