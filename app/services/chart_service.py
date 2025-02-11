@@ -49,8 +49,8 @@ class ChartService:
                 logger.info("Chrome driver initialized successfully")
                 
                 try:
-                    # TradingView URL met broker en fullscreen parameters
-                    url = f"https://www.tradingview.com/chart/?symbol={symbol}&interval={interval}&broker=FXCM&fullscreen"
+                    # TradingView URL met correcte parameters
+                    url = f"https://www.tradingview.com/chart/?symbol={symbol}&interval={interval}"
                     logger.info(f"Opening URL: {url}")
                     
                     # Get page
@@ -62,37 +62,18 @@ class ChartService:
                         EC.presence_of_element_located((By.CSS_SELECTOR, 'div[class*="chart-container"]'))
                     )
                     
-                    # Hide ALL UI elements
-                    logger.info("Hiding UI elements...")
+                    # Zoom in op de chart om grijze balken te verwijderen
+                    logger.info("Zooming chart...")
                     driver.execute_script("""
-                        // Verberg alle UI elementen
-                        const elementsToHide = [
-                            'div[class*="header"]',           // Bovenste balk
-                            'div[class*="pane-legend"]',      // Rechter zijbalk
-                            'div[class*="layout__area--left"]',   // Linker zijbalk
-                            'div[class*="layout__area--right"]',  // Rechter zijbalk
-                            'div[class*="layout__area--bottom"]', // Footer
-                            'div[class*="pane-toolbox"]',     // Indicator knoppen
-                            'div[class*="button"]',           // Alle knoppen
-                            'div[class*="toolbar"]',          // Toolbars
-                            'div[class*="drawingToolbar"]',   // Teken toolbar
-                            'div[class*="group-2JyOhh7Z"]',   // Extra UI elementen
-                            'div[class*="chart-controls"]'    // Chart controls
-                        ];
-                        
-                        elementsToHide.forEach(selector => {
-                            document.querySelectorAll(selector).forEach(e => {
-                                e.style.display = 'none';
-                                e.remove();  // Volledig verwijderen
-                            });
-                        });
-                        
-                        // Maximaliseer chart gebied
-                        document.querySelector('div[class*="chart-container"]').style.width = '100%';
-                        document.querySelector('div[class*="chart-container"]').style.height = '100vh';
+                        // Zoom in op de chart
+                        const chart = document.querySelector('div[class*="chart-container"]');
+                        if (chart) {
+                            chart.style.transform = 'scale(1.2)';  // 20% inzoomen
+                            chart.style.transformOrigin = 'center center';
+                        }
                     """)
                     
-                    # Extra wachttijd voor UI updates
+                    # Extra wachttijd voor zoom effect
                     time.sleep(2)
                     
                     # Take screenshot
