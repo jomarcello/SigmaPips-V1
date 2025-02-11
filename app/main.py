@@ -5,7 +5,7 @@ from telegram import Bot, Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, MessageHandler, filters
 from app.bot.constants import MARKETS
 from app.utils.supabase import supabase
-from app.services.trading_bot import bot
+from app.services.trading_bot import trading_bot
 
 # Set up logging
 logging.basicConfig(
@@ -35,7 +35,7 @@ async def startup_event():
         await telegram_bot.initialize()
         
         # Initialize TradingBot with the same bot instance
-        bot.initialize(telegram_bot)
+        trading_bot.initialize(telegram_bot)
         
         # Initialize application
         logger.info("Initializing application...")
@@ -110,7 +110,7 @@ async def button_callback(update: Update, context):
         
         if query.data.startswith("chart_") or query.data.startswith("sentiment_") or query.data.startswith("calendar_"):
             # Use TradingBot for signal-related buttons
-            await bot.handle_button_click({
+            await trading_bot.handle_button_click({
                 "data": query.data,
                 "message": {
                     "chat": {
@@ -273,7 +273,7 @@ async def health():
 async def process_telegram_update(data: dict):
     """Process Telegram update in background"""
     try:
-        if update := Update.de_json(data, bot):
+        if update := Update.de_json(data, trading_bot):
             await application.process_update(update)
             logger.info("Update processed successfully")
     except Exception as e:
@@ -291,7 +291,7 @@ async def webhook(request: Request):
         logger.info(f"Received update: {data}")
         
         # Process update
-        if update := Update.de_json(data, bot):
+        if update := Update.de_json(data, trading_bot):
             await application.process_update(update)
             logger.info("Update processed successfully")
         
@@ -321,7 +321,7 @@ async def send_test_signal():
         }
         
         # Process via TradingBot
-        result = await bot.process_signal(signal)
+        result = await trading_bot.process_signal(signal)
         
         return {
             "status": "success",
