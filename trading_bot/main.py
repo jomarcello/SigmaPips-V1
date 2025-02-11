@@ -23,6 +23,11 @@ news_ai = NewsAIService(db)
 chart = ChartService()
 calendar = CalendarService(db)
 
+@app.get("/health")
+async def health_check():
+    """Health check endpoint voor Railway"""
+    return {"status": "healthy"}
+
 @app.post("/signal")
 async def process_signal(signal: Dict[str, Any]):
     """Process trading signal"""
