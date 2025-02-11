@@ -159,44 +159,40 @@ Actions:
         try:
             data = callback_query['data']
             chat_id = callback_query['message']['chat']['id']
-            message_id = callback_query['message']['message_id']  # Voor het updaten van het bericht
             
-            # Sla de huidige selectie op in Redis/state
             if data.startswith('market_'):
                 market = data.split('_')[1]
-                # Sla market op voor deze user
                 await self.db.save_user_state(chat_id, {'market': market})
-                # Toon instrumenten voor deze markt
                 await self._ask_instrument(chat_id, market)
                 
             elif data.startswith('instrument_'):
                 instrument = data.split('_')[1]
-                # Sla instrument op
-                await self.db.save_user_state(chat_id, {'instrument': instrument})
-                # Vraag timeframe
+                state = await self.db.get_user_state(chat_id)
+                state['instrument'] = instrument
+                await self.db.save_user_state(chat_id, state)
                 await self._ask_timeframe(chat_id, instrument)
                 
             elif data.startswith('timeframe_'):
                 timeframe = data.split('_')[1]
-                # Haal opgeslagen state op
                 state = await self.db.get_user_state(chat_id)
-                # Sla complete preference op
-                await self.db.save_preference(chat_id, {
+                preference = {
                     'market': state['market'],
                     'instrument': state['instrument'],
                     'timeframe': timeframe
-                })
-                # Vraag of user meer wil toevoegen
+                }
+                await self.db.save_preference(chat_id, preference)
+                await self.db.save_user_state(chat_id, {})
                 await self._ask_add_more(chat_id)
                 
             elif data == 'back_to_markets':
+                await self.db.save_user_state(chat_id, {})
                 await self.send_welcome_message(chat_id)
                 
             elif data == 'back_to_instruments':
                 state = await self.db.get_user_state(chat_id)
                 await self._ask_instrument(chat_id, state['market'])
                 
-            # Answer callback query om loading state te verwijderen
+            # Answer callback query
             async with aiohttp.ClientSession() as session:
                 await session.post(
                     f"https://api.telegram.org/bot{self.token}/answerCallbackQuery",
@@ -207,15 +203,6 @@ Actions:
             
         except Exception as e:
             logger.error(f"Error handling callback: {str(e)}")
-            # Answer callback query zelfs bij error
-            async with aiohttp.ClientSession() as session:
-                await session.post(
-                    f"https://api.telegram.org/bot{self.token}/answerCallbackQuery",
-                    json={
-                        "callback_query_id": callback_query['id'],
-                        "text": "An error occurred. Please try again."
-                    }
-                )
             raise
 
     async def _ask_instrument(self, chat_id: str, market: str):
