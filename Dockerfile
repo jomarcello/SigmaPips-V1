@@ -23,4 +23,4 @@ RUN mkdir -p logs
 ENV PORT=8080
 
 # Start de main applicatie
-CMD ["python", "-m", "uvicorn", "trading_bot.main:app", "--host", "0.0.0.0", "--port", "${PORT}"]
+CMD python -m uvicorn trading_bot.main:app --host 0.0.0.0 --port $PORT
